@@ -24,7 +24,7 @@ class SettingsRepository @Inject constructor(
     private val _nightModeEndHour = MutableStateFlow(prefs.getInt(KEY_NIGHT_END, 7)) // Default 7h / 7AM
     val nightModeEndHour: StateFlow<Int> = _nightModeEndHour.asStateFlow()
 
-    private val _clockColor = MutableStateFlow(prefs.getInt(KEY_CLOCK_COLOR, -1)) // Default -1 (White/Theme default)
+    private val _clockColor = MutableStateFlow(prefs.getInt(KEY_CLOCK_COLOR, 0)) // Default 0 (Use default blue/theme)
     val clockColor: StateFlow<Int> = _clockColor.asStateFlow()
 
     fun setAlwaysOnEnabled(enabled: Boolean) {

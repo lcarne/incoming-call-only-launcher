@@ -85,7 +85,7 @@ fun HomeScreen(
     val nightEnd by viewModel.nightModeEndHour.collectAsState()
     val savedClockColor by viewModel.clockColor.collectAsState()
 
-    val clockColor = if (savedClockColor != -1) Color(savedClockColor) else HighContrastButtonBg
+    val clockColor = if (savedClockColor != 0) Color(savedClockColor) else HighContrastButtonBg
     
     val context = LocalContext.current
     // Contacts removed from Home Screen as requested

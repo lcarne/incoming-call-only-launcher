@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -505,6 +506,7 @@ fun ContactDialog(
     )
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SettingsSection(viewModel: AdminViewModel) {
     val isAlwaysOn by viewModel.isAlwaysOnEnabled.collectAsState()
@@ -563,25 +565,44 @@ fun SettingsSection(viewModel: AdminViewModel) {
             Color.Red,
             Color.Yellow
         )
-        val currentColor = if (viewModel.clockColor.collectAsState().value != -1) Color(viewModel.clockColor.collectAsState().value).toArgb() else HighContrastButtonBg.toArgb()
+        val currentColor = if (viewModel.clockColor.collectAsState().value != 0) Color(viewModel.clockColor.collectAsState().value).toArgb() else HighContrastButtonBg.toArgb()
 
-        Row(
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(top = 16.dp).fillMaxWidth()
         ) {
             colors.forEach { color ->
+                val isSelected = color.toArgb() == currentColor
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .clickable { viewModel.setClockColor(color.toArgb()) }
                         .border(
-                            width = if (color.toArgb() == currentColor) 4.dp else 0.dp,
-                            color = if (color.toArgb() == currentColor) Color.White else Color.Transparent,
+                            width = 2.dp,
+                            color = if (color == Color.White) Color.LightGray else Color.Transparent,
                             shape = CircleShape
                         )
-                )
+                        .clickable { viewModel.setClockColor(color.toArgb()) }
+                        .border(
+                            width = if (isSelected) 4.dp else 0.dp,
+                            color = if (isSelected) {
+                                if (color == Color.White) MaterialTheme.colorScheme.primary else Color.White
+                            } else Color.Transparent,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected) {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(CircleShape)
+                                .background(if (color == Color.White) MaterialTheme.colorScheme.primary else Color.White)
+                        )
+                    }
+                }
             }
         }
     }

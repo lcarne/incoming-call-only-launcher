@@ -37,6 +37,14 @@ class CallManager @Inject constructor(
     private val _isCallAllowed = MutableStateFlow(false)
     val isCallAllowed: StateFlow<Boolean> = _isCallAllowed.asStateFlow()
 
+    private val callCallback = object : Call.Callback() {
+        override fun onStateChanged(call: Call, state: Int) {
+            if (_isCallAllowed.value) {
+                updateState(state)
+            }
+        }
+    }
+
     fun setCall(call: Call) {
         currentCall = call
         wasAnswered = false
@@ -47,31 +55,29 @@ class CallManager @Inject constructor(
         _incomingNumber.value = null
         _callState.value = CallState.Idle
         
+        // Register immediately to catch state changes during validation
+        call.registerCallback(callCallback)
+        
         val number = call.details.handle?.schemeSpecificPart
         
         scope.launch {
             val contacts = contactRepository.getContactsList()
-            val isFavorite = contacts.any { contact ->
+            val isFavorite = number != null && contacts.any { contact ->
+                @Suppress("DEPRECATION")
                 PhoneNumberUtils.compare(contact.phoneNumber, number)
             }
             
             if (isFavorite) {
+                // Must be on Main thread to avoid UI races if using flows in some ways
+                // but StateFlow is thread safe. Ensure order.
                 _incomingNumber.value = number
                 _isCallAllowed.value = true
-                updateState(call.state)
-                
-                call.registerCallback(object : Call.Callback() {
-                    override fun onStateChanged(call: Call, state: Int) {
-                        updateState(state)
-                    }
-                })
+                updateState(call.details.state)
             } else {
                 // Silently reject if not a contact
                 call.reject(false, null)
                 // Log it as BLOCKED if screening didn't already
-                if (number != null) {
-                    logCallInternal(number, null, CallLogType.BLOCKED)
-                }
+                logCallInternal(number ?: "Inconnu", null, CallLogType.BLOCKED)
                 currentCall = null
             }
         }
@@ -117,7 +123,7 @@ class CallManager @Inject constructor(
     }
 
     fun reject() {
-        if (currentCall?.state == Call.STATE_RINGING) {
+        if (currentCall?.details?.state == Call.STATE_RINGING) {
             userRejected = true
             currentCall?.reject(false, null)
         } else {
@@ -126,9 +132,11 @@ class CallManager @Inject constructor(
     }
 
     fun clear() {
+        currentCall?.unregisterCallback(callCallback)
         currentCall = null
         _incomingNumber.value = null
         _callState.value = CallState.Idle
+        _isCallAllowed.value = false
     }
 
     private fun logCall() {

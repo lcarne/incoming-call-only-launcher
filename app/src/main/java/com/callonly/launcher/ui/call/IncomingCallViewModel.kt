@@ -31,20 +31,15 @@ class IncomingCallViewModel @Inject constructor(
         if (number == null) {
             IncomingCallUiState.Empty
         } else {
-            // Find contact
             val contact = contacts.find { 
-                 PhoneNumberUtils.compare(it.phoneNumber, number)
+                @Suppress("DEPRECATION")
+                PhoneNumberUtils.compare(it.phoneNumber, number)
             }
-            if (state == com.callonly.launcher.manager.CallState.Active) {
-                IncomingCallUiState.Active(
-                    number = number,
-                    contact = contact
-                )
-            } else {
-                IncomingCallUiState.Ringing(
-                    number = number,
-                    contact = contact
-                )
+            when (state) {
+                com.callonly.launcher.manager.CallState.Idle,
+                com.callonly.launcher.manager.CallState.Ended -> IncomingCallUiState.Empty
+                com.callonly.launcher.manager.CallState.Active -> IncomingCallUiState.Active(number, contact)
+                com.callonly.launcher.manager.CallState.Ringing -> IncomingCallUiState.Ringing(number, contact)
             }
         }
     }.stateIn(
