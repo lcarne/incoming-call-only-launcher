@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import com.callonly.launcher.ui.navigation.CallOnlyNavGraph
+import com.callonly.launcher.ui.theme.CallOnlyTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
