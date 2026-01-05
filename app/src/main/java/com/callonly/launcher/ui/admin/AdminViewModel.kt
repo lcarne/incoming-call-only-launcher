@@ -10,14 +10,28 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.callonly.launcher.data.repository.CallLogRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(
-    private val repository: ContactRepository
+    private val repository: ContactRepository,
+    private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository,
+    private val callLogRepository: CallLogRepository
 ) : ViewModel() {
 
     val contacts = repository.getAllContacts()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val isAlwaysOnEnabled = settingsRepository.isAlwaysOnEnabled
+    val nightModeStartHour = settingsRepository.nightModeStartHour
+    val nightModeEndHour = settingsRepository.nightModeEndHour
+
+    val callLogs = callLogRepository.getAllCallLogs()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -49,9 +63,38 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    fun updateContact(contact: Contact) {
+        viewModelScope.launch {
+            repository.updateContact(contact)
+        }
+    }
+
     fun deleteContact(contact: Contact) {
         viewModelScope.launch {
             repository.deleteContact(contact)
+        }
+    }
+
+    fun setAlwaysOnEnabled(enabled: Boolean) {
+        settingsRepository.setAlwaysOnEnabled(enabled)
+    }
+
+    fun setNightModeStartHour(hour: Int) {
+        settingsRepository.setNightModeStartHour(hour)
+    }
+
+    fun setNightModeEndHour(hour: Int) {
+        settingsRepository.setNightModeEndHour(hour)
+    }
+
+    val clockColor = settingsRepository.clockColor
+    fun setClockColor(color: Int) {
+        settingsRepository.setClockColor(color)
+    }
+
+    fun clearCallHistory() {
+        viewModelScope.launch {
+            callLogRepository.clearHistory()
         }
     }
 }

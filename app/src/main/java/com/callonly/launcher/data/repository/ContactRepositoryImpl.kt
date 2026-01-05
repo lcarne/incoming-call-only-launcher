@@ -10,6 +10,8 @@ class ContactRepositoryImpl @Inject constructor(
 ) : ContactRepository {
     override fun getAllContacts(): Flow<List<Contact>> = contactDao.getAllContacts()
 
+    override suspend fun getContactsList(): List<Contact> = contactDao.getContactsList()
+
     override suspend fun getContactById(id: Int): Contact? = contactDao.getContactById(id)
 
     override suspend fun insertContact(contact: Contact) = contactDao.insertContact(contact)

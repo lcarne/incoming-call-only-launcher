@@ -12,6 +12,12 @@ import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import com.callonly.launcher.ui.navigation.CallOnlyNavGraph
 import com.callonly.launcher.ui.theme.CallOnlyTheme
+import com.callonly.launcher.ui.call.IncomingCallScreen
+import com.callonly.launcher.ui.call.IncomingCallViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.Box
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -23,11 +29,39 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CallOnlyTheme {
-                CallOnlyNavGraph(
-                    onCall = { contact ->
-                        makeCall(contact.phoneNumber)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Main App Content
+                    CallOnlyNavGraph(
+                        onCall = { contact ->
+                            makeCall(contact.phoneNumber)
+                        },
+                        onUnpin = {
+                            try {
+                                stopLockTask()
+                                // Re-enable Status Bar if we are Device Owner
+                                val dpm = getSystemService(android.content.Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+                                val adminComponent = android.content.ComponentName(this@MainActivity, com.callonly.launcher.receivers.CallOnlyAdminReceiver::class.java)
+                                if (dpm.isDeviceOwnerApp(packageName)) {
+                                    dpm.setStatusBarDisabled(adminComponent, false)
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    )
+                    
+                    // Incoming Call Overlay
+                    val incomingCallViewModel: IncomingCallViewModel = hiltViewModel()
+                    val uiState by incomingCallViewModel.incomingCallState.collectAsState()
+                    
+                    if (uiState !is com.callonly.launcher.ui.call.IncomingCallUiState.Empty) {
+                        IncomingCallScreen(
+                            viewModel = incomingCallViewModel,
+                            onCallRejected = { /* Managed by ViewModel */ },
+                            onCallEnded = { /* Managed by ViewModel/State */ }
+                        )
                     }
-                )
+                }
             }
         }
     }
@@ -35,11 +69,32 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         hideSystemUI()
-        // Attempt to start Lock Task mode (Screen Pinning)
-        // Note: For true Kiosk (no user confirm), app must be Device Owner. 
-        // Otherwise this asks user to pin.
+        
+        // Kiosk Mode / Lock Task
+        val dpm = getSystemService(android.content.Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+        val adminComponent = android.content.ComponentName(this, com.callonly.launcher.receivers.CallOnlyAdminReceiver::class.java)
+        
+        if (dpm.isDeviceOwnerApp(packageName)) {
+            // Whitelist ourselves if we are owner
+            if (!dpm.isLockTaskPermitted(packageName)) {
+                dpm.setLockTaskPackages(adminComponent, arrayOf(packageName))
+            }
+            
+            // STRICT KIOSK: Disable Status Bar and all Lock Task Features (Home, Notifications, etc.)
+            try {
+                dpm.setLockTaskFeatures(adminComponent, android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_NONE)
+                dpm.setStatusBarDisabled(adminComponent, true)
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+        }
+        
         try {
-             // startLockTask() // Uncomment to enforce pinning if desired
+             // Only start lock task if not already in lock task mode
+             val am = getSystemService(android.content.Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+             if (am.lockTaskModeState == android.app.ActivityManager.LOCK_TASK_MODE_NONE) {
+                 startLockTask()
+             }
         } catch (e: Exception) {
             e.printStackTrace()
         }

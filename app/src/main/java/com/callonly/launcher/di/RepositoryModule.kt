@@ -1,5 +1,7 @@
 package com.callonly.launcher.di
 
+import com.callonly.launcher.data.repository.CallLogRepository
+import com.callonly.launcher.data.repository.CallLogRepositoryImpl
 import com.callonly.launcher.data.repository.ContactRepository
 import com.callonly.launcher.data.repository.ContactRepositoryImpl
 import dagger.Binds
@@ -17,4 +19,10 @@ abstract class RepositoryModule {
     abstract fun bindContactRepository(
         contactRepositoryImpl: ContactRepositoryImpl
     ): ContactRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCallLogRepository(
+        callLogRepositoryImpl: CallLogRepositoryImpl
+    ): CallLogRepository
 }

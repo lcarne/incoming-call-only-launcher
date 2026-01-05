@@ -10,7 +10,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    repository: ContactRepository
+    repository: ContactRepository,
+    private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository
 ) : ViewModel() {
 
     val contacts = repository.getAllContacts()
@@ -19,4 +20,9 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    val isAlwaysOnEnabled = settingsRepository.isAlwaysOnEnabled
+    val nightModeStartHour = settingsRepository.nightModeStartHour
+    val nightModeEndHour = settingsRepository.nightModeEndHour
+    val clockColor = settingsRepository.clockColor
 }

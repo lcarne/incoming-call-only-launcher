@@ -3,6 +3,7 @@ package com.callonly.launcher.di
 import android.content.Context
 import androidx.room.Room
 import com.callonly.launcher.data.local.AppDatabase
+import com.callonly.launcher.data.local.CallLogDao
 import com.callonly.launcher.data.local.ContactDao
 import dagger.Module
 import dagger.Provides
@@ -22,11 +23,17 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "callonly_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+         .build()
     }
 
     @Provides
     fun provideContactDao(database: AppDatabase): ContactDao {
         return database.contactDao()
+    }
+
+    @Provides
+    fun provideCallLogDao(database: AppDatabase): CallLogDao {
+        return database.callLogDao()
     }
 }
