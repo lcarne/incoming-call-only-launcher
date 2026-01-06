@@ -30,8 +30,6 @@ class SettingsRepository @Inject constructor(
     private val _allowAllCalls = MutableStateFlow(prefs.getBoolean(KEY_ALLOW_ALL_CALLS, false)) // Default False (Strict)
     val allowAllCalls: StateFlow<Boolean> = _allowAllCalls.asStateFlow()
 
-    private val _answerButtonSize = MutableStateFlow(prefs.getFloat(KEY_ANSWER_BUTTON_SIZE, 120f)) // Default 120dp
-    val answerButtonSize: StateFlow<Float> = _answerButtonSize.asStateFlow()
 
     private val _isRingerEnabled = MutableStateFlow(prefs.getBoolean(KEY_RINGER_ENABLED, true))
     val isRingerEnabled: StateFlow<Boolean> = _isRingerEnabled.asStateFlow()
@@ -74,10 +72,6 @@ class SettingsRepository @Inject constructor(
         _allowAllCalls.value = enabled
     }
 
-    fun setAnswerButtonSize(size: Float) {
-        _answerButtonSize.value = size
-        prefs.edit().putFloat(KEY_ANSWER_BUTTON_SIZE, size).apply()
-    }
 
     fun setRingerEnabled(enabled: Boolean) {
         _isRingerEnabled.value = enabled
@@ -109,7 +103,6 @@ class SettingsRepository @Inject constructor(
         private const val KEY_NIGHT_END = "night_mode_end"
         private const val KEY_CLOCK_COLOR = "clock_color"
         private const val KEY_ALLOW_ALL_CALLS = "allow_all_calls"
-        private const val KEY_ANSWER_BUTTON_SIZE = "answer_button_size"
         private const val KEY_RINGER_ENABLED = "ringer_enabled"
         private const val KEY_RINGER_VOLUME = "ringer_volume"
 

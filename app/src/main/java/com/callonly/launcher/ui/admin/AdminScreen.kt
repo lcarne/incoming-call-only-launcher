@@ -894,71 +894,11 @@ fun SettingsSection(viewModel: AdminViewModel) {
             }
         }
         
-        Divider(modifier = Modifier.padding(vertical = 16.dp))
-        Text(stringResource(id = com.callonly.launcher.R.string.answer_button_size), style = MaterialTheme.typography.titleLarge)
-        
-        val answerButtonSize by viewModel.answerButtonSize.collectAsState()
-        Text(stringResource(id = com.callonly.launcher.R.string.answer_button_size_value, answerButtonSize.toInt()), style = MaterialTheme.typography.bodyMedium)
-        Slider(
-            value = answerButtonSize,
-            onValueChange = { viewModel.setAnswerButtonSize(it) },
-            valueRange = 80f..200f,
-            steps = 120
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        var showPreview by remember { mutableStateOf(false) }
         var showLangDialog by remember { mutableStateOf(false) }
         
-        Button(
-            onClick = { showPreview = true },
-            modifier = Modifier.fillMaxWidth().height(72.dp),
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer)
-        ) {
-            Text(
-                text = stringResource(id = com.callonly.launcher.R.string.preview_call_screen),
-                maxLines = 2,
-                softWrap = true,
-                textAlign = TextAlign.Center
-            )
-        }
-
-        if (showPreview) {
-            androidx.compose.ui.window.Dialog(
-                onDismissRequest = { showPreview = false },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = true
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black)
-                        .clickable { showPreview = false }
-                ) {
-                    com.callonly.launcher.ui.call.CallLayout(
-                        number = "06 12 34 56 78",
-                        contact = Contact(name = stringResource(id = com.callonly.launcher.R.string.preview_contact_name), phoneNumber = "06 12 34 56 78", photoUri = null),
-                        state = com.callonly.launcher.ui.call.IncomingCallUiState.Ringing("06 12 34 56 78", null),
-                        isSpeakerOn = false
-                    )
-                    
-                    Text(
-                        text = stringResource(id = com.callonly.launcher.R.string.click_anywhere_close),
-                        color = Color.Gray.copy(alpha = 0.5f),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
-                    )
-                }
-            }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
         Divider(modifier = Modifier.padding(vertical = 8.dp))
-        // Language section under preview
+        // Language section
         Text(
             text = stringResource(id = com.callonly.launcher.R.string.settings_language_section_title),
             style = MaterialTheme.typography.titleMedium,

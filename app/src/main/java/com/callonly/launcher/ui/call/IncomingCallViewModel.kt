@@ -53,11 +53,6 @@ class IncomingCallViewModel @Inject constructor(
     private val _callDuration = MutableStateFlow(0L)
     val callDuration: StateFlow<Long> = _callDuration.asStateFlow()
 
-    val answerButtonSize = settingsRepository.answerButtonSize
-
-    fun setAnswerButtonSize(size: Float) {
-        settingsRepository.setAnswerButtonSize(size)
-    }
 
     init {
         viewModelScope.launch {

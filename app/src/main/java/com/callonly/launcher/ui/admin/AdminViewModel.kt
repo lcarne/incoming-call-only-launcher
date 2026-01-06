@@ -32,7 +32,6 @@ class AdminViewModel @Inject constructor(
     val nightModeStartHour = settingsRepository.nightModeStartHour
     val nightModeEndHour = settingsRepository.nightModeEndHour
     val allowAllCalls = settingsRepository.allowAllCalls
-    val answerButtonSize = settingsRepository.answerButtonSize
     val ringerVolume = settingsRepository.ringerVolume
     val isRingerEnabled = settingsRepository.isRingerEnabled
 
@@ -121,9 +120,6 @@ class AdminViewModel @Inject constructor(
         settingsRepository.setAllowAllCalls(enabled)
     }
 
-    fun setAnswerButtonSize(size: Float) {
-        settingsRepository.setAnswerButtonSize(size)
-    }
 
     fun setRingerVolume(volume: Int) {
         settingsRepository.setRingerVolume(volume)
