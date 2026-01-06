@@ -37,6 +37,7 @@ fun CameraScreen(
     val previewView = remember { PreviewView(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
     val executor = remember { Executors.newSingleThreadExecutor() }
+    val mainExecutor = ContextCompat.getMainExecutor(context)
 
     LaunchedEffect(Unit) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -107,7 +108,10 @@ fun CameraScreen(
                     object : ImageCapture.OnImageSavedCallback {
                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                             val uri = Uri.fromFile(photoFile)
-                            onPhotoCaptured(uri)
+                            // Ensure UI updates happen on the main thread
+                            mainExecutor.execute {
+                                onPhotoCaptured(uri)
+                            }
                         }
 
                         override fun onError(exception: ImageCaptureException) {
