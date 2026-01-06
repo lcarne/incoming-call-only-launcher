@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CallOnly"
+rootProject.name = "Call Only Launcher"
 include(":app")
