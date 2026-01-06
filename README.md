@@ -1,11 +1,13 @@
 # Call Only Launcher – Minimalist & Secure Android Launcher
 
-<p align="center">
+<p>
   <img src="images/app_icon.svg" alt="App icon" width="160"/>
 </p>
 
-Call Only Launcher is an ultra-simplified open-source Android launcher designed for elderly or vulnerable users.  
-It converts an Android device into a tightly controlled phone interface focused on readability and safe incoming calls.
+Call Only Launcher is a minimalist open-source Android launcher for elderly or vulnerable users.
+It allows incoming calls only from trusted contacts, outgoing calls are completely disabled.
+
+All other features (notifications, settings, system UI) are hidden to ensure safety and simplicity.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Android](https://img.shields.io/badge/platform-Android-green.svg)
@@ -20,6 +22,13 @@ Call Only Launcher locks the user into a simple interface that emphasizes two pr
 - Receive **incoming calls only** from a curated list of trusted contacts (Favorites)
 
 Other system features (notifications, outgoing dialer, settings, system UI) are hidden or restricted to prevent confusion and accidental misuse.
+
+**Typical use cases include:**
+- Elderly users who should not place accidental or emergency calls
+- People with Alzheimer’s disease or cognitive impairment
+- Patients in care facilities or hospitals
+- Children or vulnerable individuals using a shared or dedicated device
+- Situations where caregivers need full control over who can call the device
 
 ---
 
@@ -64,53 +73,78 @@ Other system features (notifications, outgoing dialer, settings, system UI) are 
 
 ## Screenshots
 
-> Screenshots below use a white background.  
-> A soft shadow is applied so they remain visible in light and dark modes.
+> Clean, high-contrast UI designed for elderly and vulnerable users.
 
-### Home screen
-<p align="center">
-  <img src="images/home.png" alt="Home screen" width="360"
-    style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15);" />
-</p>
+### Home & Incoming Call
 
-### Incoming call
-<p align="center">
-  <img src="images/incoming_call.png" alt="Incoming call" width="360"
-    style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15);" />
-</p>
+<table>
+  <tr>
+    <td align="center">
+      <img src="images/home.png" width="320" alt="Home screen"/><br/>
+      <strong>Home screen</strong>
+    </td>
+    <td align="center">
+      <img src="images/incoming_call.png" width="320" alt="Incoming call"/><br/>
+      <strong>Incoming call</strong>
+    </td>
+  </tr>
+</table>
 
-### Admin / PIN entry
-<p align="center">
-  <img src="images/admin.png" alt="Admin screen" width="360"
-    style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15);" />
-</p>
+---
 
-### Contact management
-<p align="center">
-  <img src="images/contacts.png" alt="Contacts screen" width="360"
-    style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15);" />
-</p>
+### Admin & Contact Management
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="images/admin.png" width="320" alt="Admin PIN"/><br/>
+      <strong>Admin / PIN entry</strong>
+    </td>
+    <td align="center">
+      <img src="images/contacts.png" width="320" alt="Contacts"/><br/>
+      <strong>Favorite contacts</strong>
+    </td>
+  </tr>
+</table>
+
+---
 
 ### Settings
-<p align="center">
-  <img src="images/settings.png" alt="Settings screen" width="360"
-    style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15);" />
-</p>
 
-### Additional screens
-<p align="center">
-  <img src="images/home_ring_off.png" alt="Home (ring off)" width="320"
-    style="background:#fff; padding:10px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,0.15);" />
-  <img src="images/contacts_add.png" alt="Add contact" width="320"
-    style="background:#fff; padding:10px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,0.15);" />
-</p>
+<table>
+  <tr>
+    <td align="center">
+      <img src="images/settings_1.png" width="320" alt="Settings"/><br/>
+      <strong>Settings</strong>
+    </td>
+    <td align="center">
+      <img src="images/settings_2.png" width="320" alt="Settings"/><br/>
+      <strong>Advanced options</strong>
+    </td>
+  </tr>
+</table>
 
-<p align="center">
-  <img src="images/contacts_add_photo.png" alt="Add contact photo" width="320"
-    style="background:#fff; padding:10px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,0.15);" />
-  <img src="images/admin_language.png" alt="Admin language" width="320"
-    style="background:#fff; padding:10px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,0.15);" />
-</p>
+---
+
+### Additional States
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="images/home_ring_off.png" width="280" alt="Ring off"/><br/>
+      <strong>Ringer disabled</strong>
+    </td>
+    <td align="center">
+      <img src="images/home_night.png" width="280" alt="Night mode"/><br/>
+      <strong>Night mode</strong>
+    </td>
+    <td align="center">
+      <img src="images/ongoing_call.png" width="280" alt="Ongoing call"/><br/>
+      <strong>Ongoing call</strong>
+    </td>
+  </tr>
+</table>
+
 
 ---
 
@@ -201,4 +235,4 @@ Contributions and corrections are welcome. Please open issues or pull requests f
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file.
+This project is licensed under the MIT License, see the [LICENSE](LICENSE) file.
