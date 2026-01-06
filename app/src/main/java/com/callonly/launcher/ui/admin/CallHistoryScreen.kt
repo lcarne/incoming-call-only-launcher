@@ -23,6 +23,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +45,7 @@ fun CallHistoryScreen(
     onBack: () -> Unit
 ) {
     val callLogs by viewModel.callLogs.collectAsState()
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -51,7 +57,7 @@ fun CallHistoryScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.clearCallHistory() }) {
+                    IconButton(onClick = { showDeleteConfirmation = true }) {
                         Icon(Icons.Default.Delete, contentDescription = "Clear all", tint = MaterialTheme.colorScheme.error)
                     }
                 }
@@ -78,6 +84,29 @@ fun CallHistoryScreen(
                     CallLogItem(log)
                 }
             }
+        }
+
+        if (showDeleteConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showDeleteConfirmation = false },
+                title = { Text("Supprimer l'historique") },
+                text = { Text("Êtes-vous sûr de vouloir supprimer tout l'historique des appels ? Cette action est irréversible.") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.clearCallHistory()
+                            showDeleteConfirmation = false
+                        }
+                    ) {
+                        Text("Supprimer", color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteConfirmation = false }) {
+                        Text("Annuler")
+                    }
+                }
+            )
         }
     }
 }

@@ -5,6 +5,7 @@ import com.callonly.launcher.data.model.CallLog
 import com.callonly.launcher.data.model.CallLogType
 import com.callonly.launcher.data.repository.CallLogRepository
 import com.callonly.launcher.data.repository.ContactRepository
+import com.callonly.launcher.data.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import android.telephony.PhoneNumberUtils
@@ -18,7 +19,8 @@ import javax.inject.Singleton
 @Singleton
 class CallManager @Inject constructor(
     private val callLogRepository: CallLogRepository,
-    private val contactRepository: ContactRepository
+    private val contactRepository: ContactRepository,
+    private val settingsRepository: SettingsRepository
 ) {
 
     private var currentCall: Call? = null
@@ -66,8 +68,7 @@ class CallManager @Inject constructor(
                 @Suppress("DEPRECATION")
                 PhoneNumberUtils.compare(contact.phoneNumber, number)
             }
-            
-            if (isFavorite) {
+            if (isFavorite || settingsRepository.allowAllCalls.value) {
                 // Must be on Main thread to avoid UI races if using flows in some ways
                 // but StateFlow is thread safe. Ensure order.
                 _incomingNumber.value = number
@@ -149,7 +150,10 @@ class CallManager @Inject constructor(
         
         scope.launch {
             val contacts = contactRepository.getContactsList()
-            val contact = contacts.find { it.phoneNumber == number }
+            val contact = contacts.find { 
+                @Suppress("DEPRECATION")
+                PhoneNumberUtils.compare(it.phoneNumber, number)
+            }
             
             callLogRepository.insertCallLog(
                 CallLog(

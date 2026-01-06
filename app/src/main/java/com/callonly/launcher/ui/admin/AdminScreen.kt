@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -88,28 +89,62 @@ fun AdminContent(
     onUnpin: () -> Unit
 ) {
     var currentView by remember { mutableStateOf("SETTINGS") } // SETTINGS, CONTACTS, or HISTORY
+    var pendingPhotoCaptured: ((android.net.Uri) -> Unit)? by remember { mutableStateOf(null) }
+    var isCameraOpen by remember { mutableStateOf(false) }
 
-    when (currentView) {
-        "CONTACTS" -> {
-            ContactManagementScreen(
-                viewModel = viewModel,
-                onBack = { currentView = "SETTINGS" }
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (currentView) {
+            "CONTACTS" -> {
+                ContactManagementScreen(
+                    viewModel = viewModel,
+                    onBack = { currentView = "SETTINGS" },
+                    onOpenCamera = { onCaptured ->
+                        pendingPhotoCaptured = onCaptured
+                        isCameraOpen = true
+                    }
+                )
+            }
+            "HISTORY" -> {
+                CallHistoryScreen(
+                    viewModel = viewModel,
+                    onBack = { currentView = "SETTINGS" }
+                )
+            }
+            else -> {
+                AdminSettingsScreen(
+                    viewModel = viewModel,
+                    onExit = onExit,
+                    onUnpin = onUnpin,
+                    onManageContacts = { currentView = "CONTACTS" },
+                    onShowHistory = { currentView = "HISTORY" }
+                )
+            }
         }
-        "HISTORY" -> {
-            CallHistoryScreen(
-                viewModel = viewModel,
-                onBack = { currentView = "SETTINGS" }
-            )
-        }
-        else -> {
-            AdminSettingsScreen(
-                viewModel = viewModel,
-                onExit = onExit,
-                onUnpin = onUnpin,
-                onManageContacts = { currentView = "CONTACTS" },
-                onShowHistory = { currentView = "HISTORY" }
-            )
+
+        if (isCameraOpen) {
+            androidx.compose.ui.window.Dialog(
+                onDismissRequest = { 
+                    isCameraOpen = false
+                    pendingPhotoCaptured = null
+                },
+                properties = androidx.compose.ui.window.DialogProperties(
+                    usePlatformDefaultWidth = false,
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                CameraScreen(
+                    onPhotoCaptured = { uri ->
+                        pendingPhotoCaptured?.invoke(uri)
+                        isCameraOpen = false
+                        pendingPhotoCaptured = null
+                    },
+                    onCancel = {
+                        isCameraOpen = false
+                        pendingPhotoCaptured = null
+                    }
+                )
+            }
         }
     }
 }
@@ -157,7 +192,7 @@ fun PinEntryScreen(
                 Text("Valider")
             }
             TextButton(onClick = onExit) {
-                Text("Quitter")
+                Text("Retour")
             }
         }
     }
@@ -172,25 +207,12 @@ fun AdminSettingsScreen(
     onManageContacts: () -> Unit,
     onShowHistory: () -> Unit
 ) {
+    val scrollState = androidx.compose.foundation.rememberScrollState()
+    
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Paramètres") },
-                actions = {
-                    TextButton(onClick = {
-                         onUnpin()
-                         viewModel.logout()
-                         onExit()
-                    }) {
-                        Text("Déverrouiller")
-                    }
-                    TextButton(onClick = {
-                        viewModel.logout()
-                        onExit()
-                    }) {
-                        Text("Sortir")
-                    }
-                }
+                title = { Text("Paramètres") }
             )
         }
     ) { padding ->
@@ -198,8 +220,42 @@ fun AdminSettingsScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
+            Text(
+                text = "Paramètres",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Button(
+                    onClick = {
+                        onUnpin()
+                        viewModel.logout()
+                        onExit()
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer)
+                ) {
+                    Text("Déverrouiller 🔓")
+                }
+                
+                Button(
+                    onClick = {
+                        viewModel.logout()
+                        onExit()
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                ) {
+                    Text("Retour ⬅️")
+                }
+            }
+
             Button(
                 onClick = onManageContacts,
                 modifier = Modifier.fillMaxWidth().height(64.dp),
@@ -231,7 +287,8 @@ fun AdminSettingsScreen(
 @Composable
 fun ContactManagementScreen(
     viewModel: AdminViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenCamera: ((android.net.Uri) -> Unit) -> Unit
 ) {
     val contacts by viewModel.contacts.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
@@ -272,6 +329,11 @@ fun ContactManagementScreen(
             ContactDialog(
                 contactToEdit = null,
                 onDismiss = { showAddDialog = false },
+                onOpenCamera = { onCaptured ->
+                    onOpenCamera { uri ->
+                        onCaptured(uri)
+                    }
+                },
                 onConfirm = { name, number, photoUri ->
                     viewModel.addContact(name, number, photoUri)
                     showAddDialog = false
@@ -283,6 +345,11 @@ fun ContactManagementScreen(
             ContactDialog(
                 contactToEdit = contactToEdit,
                 onDismiss = { contactToEdit = null },
+                onOpenCamera = { onCaptured ->
+                    onOpenCamera { uri ->
+                        onCaptured(uri)
+                    }
+                },
                 onConfirm = { name, number, photoUri ->
                     viewModel.updateContact(contactToEdit!!.copy(name = name, phoneNumber = number, photoUri = photoUri))
                     contactToEdit = null
@@ -328,10 +395,12 @@ fun ContactListItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactDialog(
     contactToEdit: Contact?,
     onDismiss: () -> Unit,
+    onOpenCamera: ((android.net.Uri) -> Unit) -> Unit,
     onConfirm: (String, String, String?) -> Unit
 ) {
     var firstName by remember { mutableStateOf("") }
@@ -362,6 +431,8 @@ fun ContactDialog(
         contract = androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> photoUri = uri }
     )
+
+    var showPhotoSourceDialog by remember { mutableStateOf(false) }
 
     val contactPicker = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.PickContact(),
@@ -418,6 +489,17 @@ fun ContactDialog(
         }
     )
 
+    val cameraPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                // If granted, the user will have to click again. 
+                // Or we could trigger it here if we store state.
+                // Keeping it simple for now: user clicks again.
+            }
+        }
+    )
+
     val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -453,36 +535,99 @@ fun ContactDialog(
         },
         text = {
             Column {
+                val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+                
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text("Prénom") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
+                    ),
                     modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text("Nom") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
+                    ),
                     modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = number,
                     onValueChange = { number = it },
                     label = { Text("Numéro") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onDone = { focusManager.clearFocus() }
+                    ),
                     modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
                 )
                 Button(
-                    onClick = { 
-                        photoPicker.launch(
-                            androidx.activity.result.PickVisualMediaRequest(
-                                androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
-                            )
-                        ) 
-                    },
+                    onClick = { showPhotoSourceDialog = true },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                 ) {
-                    Text(if (photoUri != null) "Photo sélectionnée" else "Ajouter une photo")
+                    Text(if (photoUri != null) "📸 Photo sélectionnée" else "Ajouter une photo")
+                }
+                
+                if (showPhotoSourceDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showPhotoSourceDialog = false },
+                        title = { Text("Source de la photo") },
+                        text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = {
+                                        showPhotoSourceDialog = false
+                                        photoPicker.launch(
+                                            androidx.activity.result.PickVisualMediaRequest(
+                                                androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("🖼️ Galerie")
+                                }
+                                Button(
+                                    onClick = {
+                                        showPhotoSourceDialog = false
+                                        val permission = android.Manifest.permission.CAMERA
+                                        if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                            onOpenCamera { uri ->
+                                                photoUri = uri
+                                            }
+                                        } else {
+                                            cameraPermissionLauncher.launch(permission)
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("📸 Appareil photo")
+                                }
+                            }
+                        },
+                        confirmButton = {},
+                        dismissButton = {
+                            TextButton(onClick = { showPhotoSourceDialog = false }) {
+                                Text("Annuler")
+                            }
+                        }
+                    )
                 }
             }
         },
@@ -514,6 +659,25 @@ fun SettingsSection(viewModel: AdminViewModel) {
     val nightEnd by viewModel.nightModeEndHour.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
+        Divider(modifier = Modifier.padding(vertical = 16.dp))
+        Text("Sécurité des appels", style = MaterialTheme.typography.titleLarge)
+        
+        val allowAllCalls by viewModel.allowAllCalls.collectAsState()
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Accepter tous les appels", style = MaterialTheme.typography.titleMedium)
+                Text("Si désactivé, seuls les contacts sont autorisés", style = MaterialTheme.typography.bodySmall)
+            }
+            Switch(
+                checked = allowAllCalls,
+                onCheckedChange = { viewModel.setAllowAllCalls(it) }
+            )
+        }
+
         Divider(modifier = Modifier.padding(vertical = 16.dp))
         Text("Paramètres d'écran", style = MaterialTheme.typography.titleLarge)
         

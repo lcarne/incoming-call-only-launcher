@@ -126,7 +126,7 @@ private fun CallLayout(
             Box(
                 modifier = Modifier
                     .size(200.dp)
-                    .clip(CircleShape)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                     .background(Color.Gray)
             ) {
                 if (contact?.photoUri != null) {

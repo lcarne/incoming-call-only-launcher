@@ -17,7 +17,8 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val repository: ContactRepository,
     private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository,
-    private val callLogRepository: CallLogRepository
+    private val callLogRepository: CallLogRepository,
+    private val imageStorageManager: com.callonly.launcher.util.ImageStorageManager
 ) : ViewModel() {
 
     val contacts = repository.getAllContacts()
@@ -30,6 +31,7 @@ class AdminViewModel @Inject constructor(
     val isAlwaysOnEnabled = settingsRepository.isAlwaysOnEnabled
     val nightModeStartHour = settingsRepository.nightModeStartHour
     val nightModeEndHour = settingsRepository.nightModeEndHour
+    val allowAllCalls = settingsRepository.allowAllCalls
 
     val callLogs = callLogRepository.getAllCallLogs()
         .stateIn(
@@ -59,18 +61,40 @@ class AdminViewModel @Inject constructor(
 
     fun addContact(name: String, number: String, photoUri: String?) {
         viewModelScope.launch {
-            repository.insertContact(Contact(name = name, phoneNumber = number, photoUri = photoUri))
+            val localUri = photoUri?.let { uriStr ->
+                imageStorageManager.saveImageLocally(android.net.Uri.parse(uriStr))
+            }
+            repository.insertContact(Contact(name = name, phoneNumber = number, photoUri = localUri))
         }
     }
 
     fun updateContact(contact: Contact) {
         viewModelScope.launch {
-            repository.updateContact(contact)
+            // Check if photo changed
+            val existingContact = repository.getContactById(contact.id)
+            var newPhotoUri = contact.photoUri
+            
+            if (existingContact?.photoUri != contact.photoUri) {
+                // Delete old local photo if it exists
+                imageStorageManager.deleteImage(existingContact?.photoUri)
+                
+                // Save new one locally if it's not already in our storage
+                newPhotoUri = contact.photoUri?.let { uriStr ->
+                    if (!uriStr.startsWith("file://") || !uriStr.contains("contact_photos")) {
+                        imageStorageManager.saveImageLocally(android.net.Uri.parse(uriStr))
+                    } else {
+                        uriStr
+                    }
+                }
+            }
+            
+            repository.updateContact(contact.copy(photoUri = newPhotoUri))
         }
     }
 
     fun deleteContact(contact: Contact) {
         viewModelScope.launch {
+            imageStorageManager.deleteImage(contact.photoUri)
             repository.deleteContact(contact)
         }
     }
@@ -85,6 +109,10 @@ class AdminViewModel @Inject constructor(
 
     fun setNightModeEndHour(hour: Int) {
         settingsRepository.setNightModeEndHour(hour)
+    }
+
+    fun setAllowAllCalls(enabled: Boolean) {
+        settingsRepository.setAllowAllCalls(enabled)
     }
 
     val clockColor = settingsRepository.clockColor

@@ -27,6 +27,9 @@ class SettingsRepository @Inject constructor(
     private val _clockColor = MutableStateFlow(prefs.getInt(KEY_CLOCK_COLOR, 0)) // Default 0 (Use default blue/theme)
     val clockColor: StateFlow<Int> = _clockColor.asStateFlow()
 
+    private val _allowAllCalls = MutableStateFlow(prefs.getBoolean(KEY_ALLOW_ALL_CALLS, false)) // Default False (Strict)
+    val allowAllCalls: StateFlow<Boolean> = _allowAllCalls.asStateFlow()
+
     fun setAlwaysOnEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_ALWAYS_ON, enabled).apply()
         _isAlwaysOnEnabled.value = enabled
@@ -47,10 +50,16 @@ class SettingsRepository @Inject constructor(
         _clockColor.value = color
     }
 
+    fun setAllowAllCalls(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_ALLOW_ALL_CALLS, enabled).apply()
+        _allowAllCalls.value = enabled
+    }
+
     companion object {
         private const val KEY_ALWAYS_ON = "always_on_enabled"
         private const val KEY_NIGHT_START = "night_mode_start"
         private const val KEY_NIGHT_END = "night_mode_end"
         private const val KEY_CLOCK_COLOR = "clock_color"
+        private const val KEY_ALLOW_ALL_CALLS = "allow_all_calls"
     }
 }

@@ -8,6 +8,7 @@ import com.callonly.launcher.data.model.CallLog
 import com.callonly.launcher.data.model.CallLogType
 import com.callonly.launcher.data.repository.CallLogRepository
 import com.callonly.launcher.data.repository.ContactRepository
+import com.callonly.launcher.data.repository.SettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,9 @@ class CallScreeningServiceImpl : CallScreeningService() {
 
     @Inject
     lateinit var callLogRepository: CallLogRepository
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onScreenCall(callDetails: Call.Details) {
         val handle = callDetails.handle
@@ -39,12 +43,11 @@ class CallScreeningServiceImpl : CallScreeningService() {
                 
                 // Check if any contact matches the incoming number
                 val isFavorite = contacts.any { contact ->
-                    // Simplest check: exact containment or robust comparison
-                    // contact.phoneNumber might be "06 12 34...", incoming might be "+3361234..."
+                    @Suppress("DEPRECATION")
                     PhoneNumberUtils.compare(contact.phoneNumber, incomingNumber)
                 }
 
-                if (isFavorite) {
+                if (isFavorite || settingsRepository.allowAllCalls.value) {
                     allowCall(callDetails)
                 } else {
                     logBlockedCall(incomingNumber)
@@ -82,9 +85,16 @@ class CallScreeningServiceImpl : CallScreeningService() {
 
     private fun logBlockedCall(number: String) {
         CoroutineScope(Dispatchers.IO).launch {
+            val contacts = contactRepository.getContactsList()
+            val contact = contacts.find { contact ->
+                @Suppress("DEPRECATION")
+                PhoneNumberUtils.compare(contact.phoneNumber, number)
+            }
+            
             callLogRepository.insertCallLog(
                 CallLog(
                     number = number,
+                    name = contact?.name,
                     type = CallLogType.BLOCKED
                 )
             )
