@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.callonly.launcher"
-    compileSdk = 34
-
-    defaultConfig {
-        applicationId = "com.callonly.launcher"
-        minSdk = 26 // Android 8.0
-        targetSdk = 34
+    compileSdk = 35
+ 
+     defaultConfig {
+         applicationId = "com.callonly.launcher"
+         minSdk = 26 // Android 8.0
+         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
