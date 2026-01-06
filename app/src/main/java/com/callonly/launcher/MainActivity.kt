@@ -201,10 +201,11 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             combine(
                 settingsRepository.isRingerEnabled,
-                settingsRepository.ringerVolume
-            ) { enabled, volumePercent ->
-                enabled to volumePercent
-            }.collect { (enabled, volumePercent) ->
+                settingsRepository.ringerVolume,
+                settingsRepository.isVibrateEnabled
+            ) { enabled, volumePercent, vibrateEnabled ->
+                Triple(enabled, volumePercent, vibrateEnabled)
+            }.collect { (enabled, volumePercent, vibrateEnabled) ->
                 try {
                     val hasDndAccess = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         notificationManager.isNotificationPolicyAccessGranted
@@ -213,6 +214,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (enabled) {
+                        // Ringer is ON (White Button)
                         if (hasDndAccess) {
                             audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
                         }
@@ -220,16 +222,21 @@ class MainActivity : ComponentActivity() {
                         val targetVolume = (volumePercent / 100f * maxVolume).toInt()
                         audioManager.setStreamVolume(AudioManager.STREAM_RING, targetVolume, 0)
                     } else {
+                        // Ringer is OFF (Gray Button)
                         if (hasDndAccess) {
-                            audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
+                            if (vibrateEnabled) {
+                                audioManager.ringerMode = AudioManager.RINGER_MODE_VIBRATE
+                            } else {
+                                audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
+                            }
                         } else {
-                            // Fallback: set volume to 0 without changing ringer mode
+                            // Fallback: set volume to 0
                             audioManager.setStreamVolume(AudioManager.STREAM_RING, 0, 0)
                         }
                     }
                 } catch (e: SecurityException) {
                     e.printStackTrace()
-                    // If we failed to set silent mode, at least try to set volume to 0
+                    // If we failed permission, try fallback volume 0 for silent
                     if (!enabled) {
                         try {
                             audioManager.setStreamVolume(AudioManager.STREAM_RING, 0, 0)
