@@ -851,7 +851,7 @@ fun SettingsSection(viewModel: AdminViewModel) {
                 text = "Aperçu de l'écran d'appel 📱",
                 maxLines = 2,
                 softWrap = true,
-                textAlign = TextAlign.Left
+                textAlign = TextAlign.Center
             )
         }
 
