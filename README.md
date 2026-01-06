@@ -2,7 +2,15 @@
 
 CallOnly is an ultra-simplified open-source Android launcher designed for elderly or vulnerable users. It converts an Android device into a tightly controlled phone interface focused on readability and safe incoming calls.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Android](https://img.shields.io/badge/platform-Android-green.svg)
+![License](images/placeholder_icon.png) ![Android](images/placeholder_icon.png)
+
+![Screenshot Home](images/home.png)
+
+Caption: Home screen — large clock and favorites list.
+
+![Screenshot Admin](images/placeholder_screenshot_2.png)
+
+Caption: Admin settings and contact management.
 
 ## Purpose
 
@@ -27,6 +35,46 @@ Other system features (notifications, outgoing dialer, settings) are hidden or r
 - Architecture: MVVM + Hilt
 - Storage: Room Database
 - Security: DevicePolicyManager (Device Owner) and CallScreeningService
+
+## Screenshots
+
+Below are example screenshots of the main app screens. Replace these placeholders with real screenshots by saving images to the `images/` folder and keeping the same filenames.
+
+- Home screen
+
+![Home screen](images/home.png)
+
+- Incoming call
+
+![Incoming call](images/incoming_call.png)
+
+- Admin / PIN entry
+
+![Admin screen](images/admin.png)
+
+- Contact management
+
+![Contacts screen](images/contacts.png)
+
+- Settings
+
+![Settings screen](images/settings.png)
+
+-- Other images in the `images/` folder --
+
+![Home (ring off)](images/home_ring_off.png)
+
+![Add contact](images/contacts_add.png)
+
+![Add contact - take photo](images/contacts_add_photo.png)
+
+![Admin language](images/admin_language.png)
+
+![Placeholder screenshot 1](images/placeholder_screenshot_1.png)
+
+![Placeholder screenshot 2](images/placeholder_screenshot_2.png)
+
+![Placeholder icon](images/placeholder_icon.png)
 
 ## Installation & Setup
 
