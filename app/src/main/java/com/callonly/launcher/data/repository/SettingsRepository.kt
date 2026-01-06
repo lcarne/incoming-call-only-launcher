@@ -48,8 +48,7 @@ class SettingsRepository @Inject constructor(
     private val _timeFormat = MutableStateFlow(prefs.getString(KEY_TIME_FORMAT, "24") ?: "24")
     val timeFormat: StateFlow<String> = _timeFormat.asStateFlow()
 
-    private val _autoRejectTimeSeconds = MutableStateFlow(prefs.getInt(KEY_AUTO_REJECT_TIME, 0)) // Default 0 (Disabled)
-    val autoRejectTimeSeconds: StateFlow<Int> = _autoRejectTimeSeconds.asStateFlow()
+
 
     fun setAlwaysOnEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_ALWAYS_ON, enabled).apply()
@@ -106,10 +105,7 @@ class SettingsRepository @Inject constructor(
         _timeFormat.value = format
     }
 
-    fun setAutoRejectTimeSeconds(seconds: Int) {
-        prefs.edit().putInt(KEY_AUTO_REJECT_TIME, seconds).apply()
-        _autoRejectTimeSeconds.value = seconds
-    }
+
 
     companion object {
         private const val KEY_ALWAYS_ON = "always_on_enabled"
@@ -123,6 +119,6 @@ class SettingsRepository @Inject constructor(
         private const val KEY_VIBRATE_ENABLED = "vibrate_enabled"
         private const val KEY_LANGUAGE = "language"
         private const val KEY_TIME_FORMAT = "time_format"
-        private const val KEY_AUTO_REJECT_TIME = "auto_reject_time"
+
     }
 }

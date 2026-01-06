@@ -97,35 +97,12 @@ class CallManager @Inject constructor(
         }
     }
 
-    private var rejectJob: kotlinx.coroutines.Job? = null
-
     fun updateState(state: Int) {
         when (state) {
             Call.STATE_RINGING -> {
                 _callState.value = CallState.Ringing
-                
-                // Start Auto Reject Timer
-                val timeout = settingsRepository.autoRejectTimeSeconds.value
-                if (timeout > 0) {
-                    rejectJob?.cancel()
-                    rejectJob = scope.launch {
-                        kotlinx.coroutines.delay(timeout * 1000L)
-                        if (_callState.value == CallState.Ringing && currentCall != null) {
-                            reject()
-                            // Log as Rejected Auto ? We should probably differentiate or just rely on standard rejection.
-                            // The logCall() uses 'userRejected' flag. Maybe we set it to true?
-                            // Or add a specific log type for Timeout? for now "Refusé (auto)" sounds like it fits.
-                            // But reject() sets userRejected=true if we call it.
-                            // Actually reject() sets userRejected=true:
-                            // fun reject() { if (currentCall?.details?.state == Call.STATE_RINGING) { userRejected = true; ... } }
-                            // If we want to distinguish, we might need to introduce a new flag or just accept it's "Rejected".
-                            // But wait, the user wants "Refusé (auto)" probably for blocked calls, but effectively a timeout is also automatic.
-                        }
-                    }
-                }
             }
             Call.STATE_ACTIVE -> {
-                rejectJob?.cancel()
                 if (!wasAnswered) {
                     wasAnswered = true
                     answerTime = System.currentTimeMillis()
@@ -133,7 +110,6 @@ class CallManager @Inject constructor(
                 _callState.value = CallState.Active
             }
             Call.STATE_DISCONNECTED -> {
-                rejectJob?.cancel()
                 if (wasAnswered && answerTime > 0) {
                     durationSeconds = (System.currentTimeMillis() - answerTime) / 1000
                 }
@@ -142,19 +118,16 @@ class CallManager @Inject constructor(
                 currentCall = null
             }
             else -> {
-                rejectJob?.cancel()
                 _callState.value = CallState.Idle
             }
         }
     }
 
     fun accept() {
-        rejectJob?.cancel()
         currentCall?.answer(0)
     }
 
     fun reject() {
-        rejectJob?.cancel()
         if (currentCall?.details?.state == Call.STATE_RINGING) {
             userRejected = true
             currentCall?.reject(false, null)
@@ -164,7 +137,6 @@ class CallManager @Inject constructor(
     }
 
     fun clear() {
-        rejectJob?.cancel()
         currentCall?.unregisterCallback(callCallback)
         currentCall = null
         _incomingNumber.value = null

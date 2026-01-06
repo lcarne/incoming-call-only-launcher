@@ -62,8 +62,6 @@
     <string name="call_missed_label">Manqué</string>
     <string name="call_rejected_label">Refusé</string>
     <string name="call_rejected_auto_label">Refusé (auto)</string>
-    <string name="auto_reject_title">Durée de sonnerie max (sec)</string>
-    <string name="auto_reject_desc">0 = désactivé. Sinon, refuse l\'appel après X secondes.</string>
     <string name="time_format_title">Format de l\'heure</string>
     <string name="time_format_12">AM/PM</string>
     <string name="time_format_24">24h</string>

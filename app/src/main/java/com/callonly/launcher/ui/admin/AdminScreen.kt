@@ -786,19 +786,6 @@ fun SettingsSection(viewModel: AdminViewModel) {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        val autoRejectSeconds by viewModel.autoRejectTimeSeconds.collectAsState()
-        Text(stringResource(id = com.callonly.launcher.R.string.auto_reject_title), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(id = com.callonly.launcher.R.string.auto_reject_desc).replace("X", autoRejectSeconds.toString()), style = MaterialTheme.typography.bodySmall)
-        Text("${autoRejectSeconds}s", style = MaterialTheme.typography.bodyMedium)
-        Slider(
-            value = autoRejectSeconds.toFloat(),
-            onValueChange = { viewModel.setAutoRejectTimeSeconds(it.toInt()) },
-            valueRange = 0f..300f, // 0 to 5 minutes
-            steps = 59 // Step roughly every 5 seconds (300/60 = 5) - actually steps = (range / step) - 1. If we want step=5, (300/5)-1 = 59.
-        )
-
         // Language selection removed from here; use bottom Langue button in AdminSettingsScreen
 
         Spacer(modifier = Modifier.height(16.dp))
