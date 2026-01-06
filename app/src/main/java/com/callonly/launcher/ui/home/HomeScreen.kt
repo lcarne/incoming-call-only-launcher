@@ -201,9 +201,8 @@ fun HomeScreen(
                     detectTapGestures(
                         onPress = {
                             try {
-                                // Long press of 3 seconds to enter Admin
-                                // Replace 1 by 3000
-                                withTimeout(1) {
+                                // Long press of 30 seconds to enter Admin
+                                withTimeout(30000) {
                                     tryAwaitRelease()
                                 }
                             } catch (e: TimeoutCancellationException) {
