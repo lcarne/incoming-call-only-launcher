@@ -131,8 +131,8 @@ fun CallLayout(
             // Contact Photo
             Box(
                 modifier = Modifier
-                    .size(200.dp)
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .size(350.dp) // Significantly larger
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(32.dp)) // Increased corner radius for aesthetics
                     .background(Color.Gray)
             ) {
                 if (contact?.photoUri != null) {
@@ -148,7 +148,7 @@ fun CallLayout(
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
                         modifier = Modifier
-                            .size(120.dp)
+                            .size(200.dp)
                             .align(Alignment.Center),
                         tint = Color.White
                     )
