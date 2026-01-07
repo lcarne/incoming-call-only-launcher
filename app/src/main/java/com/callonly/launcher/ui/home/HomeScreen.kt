@@ -66,6 +66,9 @@ fun HomeScreen(
     }
     val isNight = isNightModeEnabled && isNightInSchedule
 
+    // Track previous night mode state to detect transitions
+    var previousIsNight by remember { mutableStateOf(isNight) }
+
     // Screen Keep On Logic
     // Helper to find Activity from Context (handles Hilt/Compose wrappers)
     fun android.content.Context.findActivity(): android.app.Activity? {
@@ -77,14 +80,27 @@ fun HomeScreen(
         return null
     }
 
-    LaunchedEffect(isAlwaysOn, isNight) {
+    LaunchedEffect(isAlwaysOn, isNight, currentTime) {
         val activity = context.findActivity()
         if (activity != null) {
+            // Detect transition from night to day
+            val isTransitioningFromNightToDay = previousIsNight && !isNight
+            
+            // Clear flags first to avoid conflicts
+            activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+            
             if (isAlwaysOn && !isNight) {
+                // If transitioning from night to day, actively wake the screen
+                if (isTransitioningFromNightToDay) {
+                    viewModel.wakeUpScreen() // Use PowerManager WakeLock to wake from deep sleep
+                }
+                // Keep screen on
                 activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            } else {
-                activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
+            
+            // Update previous state
+            previousIsNight = isNight
         }
     }
     
@@ -155,7 +171,7 @@ fun HomeScreen(
                         onPress = {
                             try {
                                 // Long press of 20 seconds to enter Admin
-                                withTimeout(1) {
+                                withTimeout(20000) {
                                     awaitRelease()
                                 }
                             } catch (e: TimeoutCancellationException) {

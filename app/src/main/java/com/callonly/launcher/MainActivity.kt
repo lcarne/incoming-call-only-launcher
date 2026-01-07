@@ -76,9 +76,6 @@ class MainActivity : ComponentActivity() {
                 Box(modifier = Modifier.fillMaxSize()) {
                     // Main App Content
                     CallOnlyNavGraph(
-                        onCall = { contact ->
-                            makeCall(contact.phoneNumber)
-                        },
                         onUnpin = {
                             try {
                                 stopLockTask()

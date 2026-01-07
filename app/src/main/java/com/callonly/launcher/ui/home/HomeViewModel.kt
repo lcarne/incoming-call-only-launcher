@@ -16,7 +16,8 @@ import android.os.Build
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository
+    private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository,
+    private val screenManager: com.callonly.launcher.manager.ScreenManager
 ) : ViewModel() {
 
     val isAlwaysOnEnabled = settingsRepository.isAlwaysOnEnabled
@@ -46,5 +47,9 @@ class HomeViewModel @Inject constructor(
 
     fun setRingerEnabled(enabled: Boolean) {
         settingsRepository.setRingerEnabled(enabled)
+    }
+
+    fun wakeUpScreen() {
+        screenManager.wakeUpScreen()
     }
 }

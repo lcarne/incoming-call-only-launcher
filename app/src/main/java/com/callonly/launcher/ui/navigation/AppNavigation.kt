@@ -11,7 +11,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun CallOnlyNavGraph(
-    onCall: (Contact) -> Unit, // Callback to handle actual calling
     onUnpin: () -> Unit // Callback to exit Kiosk mode
 ) {
     val navController = rememberNavController()
