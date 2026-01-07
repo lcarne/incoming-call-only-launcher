@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -287,6 +289,20 @@ fun AdminSettingsScreen(
 ) {
     val scrollState = androidx.compose.foundation.rememberScrollState()
     
+    val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json"),
+        onResult = { uri ->
+            uri?.let { viewModel.exportContacts(it) }
+        }
+    )
+
+    val importLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let { viewModel.importContacts(it) }
+        }
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -357,6 +373,29 @@ fun AdminSettingsScreen(
                 }
                 
                 SettingsSection(viewModel)
+
+                // Data Management Section
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(stringResource(id = com.callonly.launcher.R.string.data_management), style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Button(
+                    onClick = { exportLauncher.launch("contacts_backup.json") },
+                    modifier = Modifier.fillMaxWidth().height(64.dp)
+                ) {
+                    Text(stringResource(id = com.callonly.launcher.R.string.export_contacts), textAlign = TextAlign.Center)
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { importLauncher.launch(arrayOf("application/json")) },
+                    modifier = Modifier.fillMaxWidth().height(64.dp)
+                ) {
+                    Text(stringResource(id = com.callonly.launcher.R.string.import_contacts), textAlign = TextAlign.Center)
+                }
 
                 Spacer(modifier = Modifier.height(88.dp))
             }
@@ -791,16 +830,93 @@ fun SettingsSection(viewModel: AdminViewModel) {
         // Language selection removed from here; use bottom Langue button in AdminSettingsScreen
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Default Audio Output Setting
+        Text(stringResource(id = com.callonly.launcher.R.string.default_audio_output), style = MaterialTheme.typography.titleMedium)
+        val isDefaultSpeakerEnabled by viewModel.isDefaultSpeakerEnabled.collectAsState()
+        
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = { viewModel.setDefaultSpeakerEnabled(false) },
+                modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = if (!isDefaultSpeakerEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (!isDefaultSpeakerEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Icon(com.callonly.launcher.ui.theme.StatusIcons.Hearing, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(id = com.callonly.launcher.R.string.earpiece),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Button(
+                onClick = { viewModel.setDefaultSpeakerEnabled(true) },
+                modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = if (isDefaultSpeakerEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (isDefaultSpeakerEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Icon(com.callonly.launcher.ui.theme.StatusIcons.Speaker, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(id = com.callonly.launcher.R.string.speaker),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
         
         val ringerVolume by viewModel.ringerVolume.collectAsState()
         Text(stringResource(id = com.callonly.launcher.R.string.ringer_volume), style = MaterialTheme.typography.titleMedium)
-        Text("${ringerVolume}%", style = MaterialTheme.typography.bodyMedium)
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("${ringerVolume}%", style = MaterialTheme.typography.bodyMedium)
+            
+            IconButton(
+                onClick = { viewModel.testRingtone() },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = stringResource(id = com.callonly.launcher.R.string.test_ringer),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        
         Slider(
             value = ringerVolume.toFloat(),
             onValueChange = { viewModel.setRingerVolume(it.toInt()) },
-            valueRange = 0f..100f,
-            steps = 100
+            valueRange = 0f..100f
         )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(id = com.callonly.launcher.R.string.ringer_active), style = MaterialTheme.typography.titleMedium)
+            }
+            Switch(
+                checked = viewModel.isRingerEnabled.collectAsState().value,
+                onCheckedChange = { viewModel.setRingerEnabled(it) }
+            )
+        }
         Divider(modifier = Modifier.padding(vertical = 16.dp))
         Text(stringResource(id = com.callonly.launcher.R.string.screen_settings), style = MaterialTheme.typography.titleLarge)
         

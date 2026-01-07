@@ -3,10 +3,13 @@ package com.callonly.launcher.data.repository
 import com.callonly.launcher.data.local.ContactDao
 import com.callonly.launcher.data.model.Contact
 import kotlinx.coroutines.flow.Flow
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class ContactRepositoryImpl @Inject constructor(
-    private val contactDao: ContactDao
+    private val contactDao: ContactDao,
+    @ApplicationContext private val context: Context
 ) : ContactRepository {
     override fun getAllContacts(): Flow<List<Contact>> = contactDao.getAllContacts()
 
@@ -19,4 +22,63 @@ class ContactRepositoryImpl @Inject constructor(
     override suspend fun updateContact(contact: Contact) = contactDao.updateContact(contact)
 
     override suspend fun deleteContact(contact: Contact) = contactDao.deleteContact(contact)
+
+    override suspend fun exportContacts(): String {
+        val contacts = contactDao.getContactsList()
+        val exportList = contacts.map { contact ->
+            val photoBase64 = contact.photoUri?.let { uriString ->
+                try {
+                    val uri = android.net.Uri.parse(uriString)
+                    context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                        val bytes = inputStream.readBytes()
+                        android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            com.callonly.launcher.data.model.ContactExportDto(
+                name = contact.name,
+                phoneNumber = contact.phoneNumber,
+                photoBase64 = photoBase64,
+                isFavorite = contact.isFavorite
+            )
+        }
+        return com.google.gson.Gson().toJson(exportList)
+    }
+
+    override suspend fun importContacts(json: String): Int {
+        val type = object : com.google.gson.reflect.TypeToken<List<com.callonly.launcher.data.model.ContactExportDto>>() {}.type
+        val importList: List<com.callonly.launcher.data.model.ContactExportDto> = com.google.gson.Gson().fromJson(json, type)
+        
+        var count = 0
+        importList.forEach { dto ->
+            // Check if contact already exists (simple check by number)
+            val existing = contactDao.getContactsList().find { it.phoneNumber == dto.phoneNumber }
+            if (existing == null) {
+                var photoUri: String? = null
+                dto.photoBase64?.let { base64 ->
+                    try {
+                        val bytes = android.util.Base64.decode(base64, android.util.Base64.DEFAULT)
+                        val fileName = "imported_contact_${System.currentTimeMillis()}_${count}.jpg"
+                        val file = java.io.File(context.filesDir, fileName)
+                        java.io.FileOutputStream(file).use { it.write(bytes) }
+                        photoUri = android.net.Uri.fromFile(file).toString()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                
+                val newContact = Contact(
+                    name = dto.name,
+                    phoneNumber = dto.phoneNumber,
+                    photoUri = photoUri,
+                    isFavorite = dto.isFavorite
+                )
+                contactDao.insertContact(newContact)
+                count++
+            }
+        }
+        return count
+    }
 }

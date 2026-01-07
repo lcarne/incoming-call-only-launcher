@@ -18,7 +18,8 @@ class AdminViewModel @Inject constructor(
     private val repository: ContactRepository,
     private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository,
     private val callLogRepository: CallLogRepository,
-    private val imageStorageManager: com.callonly.launcher.util.ImageStorageManager
+    private val imageStorageManager: com.callonly.launcher.util.ImageStorageManager,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     val contacts = repository.getAllContacts()
@@ -37,9 +38,9 @@ class AdminViewModel @Inject constructor(
     val ringerVolume = settingsRepository.ringerVolume
     val isRingerEnabled = settingsRepository.isRingerEnabled
     val isNightModeEnabled = settingsRepository.isNightModeEnabled
-
     val language = settingsRepository.language
     val timeFormat = settingsRepository.timeFormat
+    val isDefaultSpeakerEnabled = settingsRepository.isDefaultSpeakerEnabled
 
     val callLogs = callLogRepository.getAllCallLogs()
         .stateIn(
@@ -154,6 +155,10 @@ class AdminViewModel @Inject constructor(
         settingsRepository.setTimeFormat(format)
     }
 
+    fun setDefaultSpeakerEnabled(enabled: Boolean) {
+        settingsRepository.setDefaultSpeakerEnabled(enabled)
+    }
+
 
 
     val clockColor = settingsRepository.clockColor
@@ -164,6 +169,49 @@ class AdminViewModel @Inject constructor(
     fun clearCallHistory() {
         viewModelScope.launch {
             callLogRepository.clearHistory()
+        }
+    }
+
+    fun testRingtone() {
+        viewModelScope.launch {
+            try {
+                val uri = android.media.RingtoneManager.getActualDefaultRingtoneUri(context, android.media.RingtoneManager.TYPE_RINGTONE)
+                val ringtone = android.media.RingtoneManager.getRingtone(context, uri)
+                ringtone.play()
+                // Stop after 3 seconds
+                kotlinx.coroutines.delay(3000)
+                if (ringtone.isPlaying) {
+                    ringtone.stop()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun exportContacts(uri: android.net.Uri) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val json = repository.exportContacts()
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(json.toByteArray())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun importContacts(uri: android.net.Uri) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val json = inputStream.bufferedReader().use { it.readText() }
+                    repository.importContacts(json)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

@@ -54,6 +54,9 @@ class SettingsRepository @Inject constructor(
     private val _timeFormat = MutableStateFlow(prefs.getString(KEY_TIME_FORMAT, "24") ?: "24")
     val timeFormat: StateFlow<String> = _timeFormat.asStateFlow()
 
+    private val _isDefaultSpeakerEnabled = MutableStateFlow(prefs.getBoolean(KEY_DEFAULT_SPEAKER_ENABLED, true)) // Default True (Speaker)
+    val isDefaultSpeakerEnabled: StateFlow<Boolean> = _isDefaultSpeakerEnabled.asStateFlow()
+
 
 
     fun setAlwaysOnEnabled(enabled: Boolean) {
@@ -119,6 +122,11 @@ class SettingsRepository @Inject constructor(
         _timeFormat.value = format
     }
 
+    fun setDefaultSpeakerEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_DEFAULT_SPEAKER_ENABLED, enabled).apply()
+        _isDefaultSpeakerEnabled.value = enabled
+    }
+
 
 
     companion object {
@@ -135,6 +143,6 @@ class SettingsRepository @Inject constructor(
 
         private const val KEY_LANGUAGE = "language"
         private const val KEY_TIME_FORMAT = "time_format"
-
+        private const val KEY_DEFAULT_SPEAKER_ENABLED = "default_speaker_enabled"
     }
 }

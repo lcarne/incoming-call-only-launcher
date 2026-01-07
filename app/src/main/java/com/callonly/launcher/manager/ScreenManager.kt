@@ -21,6 +21,7 @@ class ScreenManager @Inject constructor(
      * Wakes up the screen from deep sleep using a WakeLock.
      * The wake lock is automatically released after 3 seconds.
      */
+    @Suppress("DEPRECATION")
     fun wakeUpScreen() {
         try {
             // Release any existing wake lock first

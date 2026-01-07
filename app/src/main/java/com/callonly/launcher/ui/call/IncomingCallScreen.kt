@@ -102,13 +102,13 @@ fun CallLayout(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         // Battery Display at the very top
         BatteryLevelDisplay(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier,
             iconSize = 32.dp,
             fontSize = 20.sp
         )
@@ -116,7 +116,7 @@ fun CallLayout(
         // --- ZONE HAUTE : Information (Non cliquable) ---
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = if (isRinging) 48.dp else 16.dp)
+            modifier = Modifier.padding(top = if (isRinging) 48.dp else 0.dp)
         ) {
             // Photo de l'appelant
             Box(
@@ -184,7 +184,7 @@ fun CallLayout(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     if (tapsRemaining < 2) {
                         Text(
-                            text = "Encore $tapsRemaining",
+                            text = stringResource(id = com.callonly.launcher.R.string.taps_remaining, tapsRemaining),
                             color = Color.White,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
@@ -252,7 +252,7 @@ fun CallLayout(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (tapsRemaining < 2) {
                     Text(
-                        text = "Appuyez encore $tapsRemaining fois",
+                        text = stringResource(id = com.callonly.launcher.R.string.press_again, tapsRemaining),
                         color = Color.White,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
@@ -260,7 +260,7 @@ fun CallLayout(
                             .background(Color.Red.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(8.dp)) // Reduced from 16.dp
                 }
 
                 Button(
@@ -271,7 +271,7 @@ fun CallLayout(
                             tapsRemaining = 2
                         }
                     },
-                    modifier = Modifier.size(140.dp), // Reduced from 180.dp
+                    modifier = Modifier.size(140.dp), 
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     shape = CircleShape,
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
@@ -280,10 +280,10 @@ fun CallLayout(
                         imageVector = StatusIcons.CallEnd,
                         contentDescription = "End Call",
                         tint = Color.White,
-                        modifier = Modifier.size(80.dp) // Reduced from 100.dp
+                        modifier = Modifier.size(80.dp)
                     )
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp)) // Reduced from 16.dp
                 Text(
                     text = stringResource(id = com.callonly.launcher.R.string.hang_up),
                     style = MaterialTheme.typography.displaySmall,

@@ -137,8 +137,8 @@ class CallManager @Inject constructor(
                 if (!wasAnswered) {
                     wasAnswered = true
                     answerTime = System.currentTimeMillis()
-                    // Set speaker on by default for seniors
-                    setSpeakerOn(true)
+                    // Set speaker based on preference
+                    setSpeakerOn(settingsRepository.isDefaultSpeakerEnabled.value)
                 }
                 _callState.value = CallState.Active
             }
