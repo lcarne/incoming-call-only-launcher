@@ -119,70 +119,8 @@ fun NetworkSignalDisplay(
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
-    // Permission Launcher if needed (Automatic request on start)
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted -> hasPermission = isGranted }
-    )
-
-    val permissionsToRequest = mutableListOf(
-        android.Manifest.permission.READ_PHONE_STATE,
-        android.Manifest.permission.ANSWER_PHONE_CALLS,
-        android.Manifest.permission.READ_CONTACTS,
-        android.Manifest.permission.CALL_PHONE
-    ).apply {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            add(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
-
-    val multiplePermissionsLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { _ ->
-            // Update hasPermission if needed, or just let it happen
-        }
-    )
-
-    var showPermissionRationale by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        val missingPermissions = permissionsToRequest.filter {
-            ContextCompat.checkSelfPermission(
-                context,
-                it
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
-        if (missingPermissions.isNotEmpty()) {
-            multiplePermissionsLauncher.launch(missingPermissions.toTypedArray())
-        }
-
-        if (!hasPermission) {
-            showPermissionRationale = true
-        }
-    }
-
-    if (showPermissionRationale) {
-        AlertDialog(
-            onDismissRequest = { /* Prevent dismiss without action if critical, or allow */ },
-            title = { Text(stringResource(id = R.string.location_permission_title)) },
-            text = { Text(stringResource(id = R.string.location_permission_desc)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showPermissionRationale = false
-                        permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
-                ) {
-                    Text(stringResource(id = R.string.validate))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPermissionRationale = false }) {
-                    Text(stringResource(id = R.string.cancel))
-                }
-            }
-        )
-    }
+    // Monitor permission changes (re-check on resume/lifecycle if needed, but for now simple check is fine)
+    // We do NOT request permissions here anymore, as it is handled by the OnboardingFlow.
 
     DisposableEffect(hasPermission) {
         if (hasPermission) {

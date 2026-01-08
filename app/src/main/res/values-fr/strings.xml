@@ -67,11 +67,11 @@
     <string name="number">Numéro</string>
     <string name="onboarding_admin_intro_message">Pour accéder aux réglages ou quitter l\'application, il existe un menu caché :\n\nTapez *15 fois sur la date*, puis le code *1234*.</string>
     <string name="onboarding_admin_intro_title">Mode Administrateur</string>
-    <string name="onboarding_auth_calls_message">Veuillez autoriser l\'accès aux appels pour gérer les appels entrants et l\'historique.</string>
-    <string name="onboarding_auth_calls_title">Accès aux Appels</string>
-    <string name="onboarding_auth_contacts_message">Veuillez autoriser l\'accès à vos contacts pour les ajouter dans la liste de contacts.</string>
+    <string name="onboarding_auth_calls_message">Veuillez autoriser l\'accès aux appels et aux notifications pour gérer les appels entrants et l\'historique.</string>
+    <string name="onboarding_auth_calls_title">Accès Appels &amp; Notifications</string>
+    <string name="onboarding_auth_contacts_message">Veuillez autoriser l\'accès à vos contacts pour les importer dans la liste de contacts.</string>
     <string name="onboarding_auth_contacts_title">Accès aux Contacts</string>
-    <string name="onboarding_auth_intro_message">L\'application doit accéder à certaines fonctionnalités de votre téléphone pour fonctionner correctement :\n\n• *Contacts* : Pour afficher le nom de vos correspondants.\n• *Appels* : Pour détecter les appels entrants et créer un historique.\n• *Localisation* : Pour afficher les barres de réseau (imposé par Android).</string>
+    <string name="onboarding_auth_intro_message">L\'application doit accéder à certaines fonctionnalités de votre téléphone pour fonctionner correctement :\n\n• *Contacts* : Pour l\'import de vos contacts.\n• *Appels* : Pour détecter les appels entrants et créer un historique.\n• *Notifications* : Pour vous alerter des appels entrants.\n• *Localisation* : Pour afficher les barres de réseau (imposé par Android).</string>
     <string name="onboarding_auth_intro_title">Pourquoi ces autorisations ?</string>
     <string name="onboarding_auth_location_intro_message">Android exige l\'autorisation de localisation pour lire la puissance du signal réseau (les barres). L\'application *ne suit pas* votre position GPS.</string>
     <string name="onboarding_auth_location_intro_title">Localisation et Réseau</string>

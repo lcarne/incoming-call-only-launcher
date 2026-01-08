@@ -565,7 +565,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
     )
     
     val phoneLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { _ -> step++ }
     )
 
@@ -662,7 +662,16 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         when (step) {
                             0, 1, 4 -> step++
                             2 -> contactLauncher.launch(android.Manifest.permission.READ_CONTACTS)
-                            3 -> phoneLauncher.launch(android.Manifest.permission.READ_PHONE_STATE)
+                            3 -> {
+                                val permissions = mutableListOf(
+                                    android.Manifest.permission.READ_PHONE_STATE,
+                                    android.Manifest.permission.ANSWER_PHONE_CALLS
+                                )
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                                    permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                                phoneLauncher.launch(permissions.toTypedArray())
+                            }
                             5 -> locationLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
                         }
                     },
