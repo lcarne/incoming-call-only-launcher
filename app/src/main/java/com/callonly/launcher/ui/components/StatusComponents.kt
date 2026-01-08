@@ -128,6 +128,8 @@ fun NetworkSignalDisplay(
         }
     )
     
+    var showPermissionRationale by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         val missingPermissions = permissionsToRequest.filter {
             ContextCompat.checkSelfPermission(context, it) != android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -137,8 +139,31 @@ fun NetworkSignalDisplay(
         }
 
         if (!hasPermission) {
-             permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+             showPermissionRationale = true
         }
+    }
+
+    if (showPermissionRationale) {
+        AlertDialog(
+            onDismissRequest = { /* Prevent dismiss without action if critical, or allow */ },
+            title = { Text(stringResource(id = R.string.location_permission_title)) },
+            text = { Text(stringResource(id = R.string.location_permission_desc)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showPermissionRationale = false
+                        permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                ) {
+                    Text(stringResource(id = R.string.validate))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionRationale = false }) {
+                    Text(stringResource(id = R.string.cancel))
+                }
+            }
+        )
     }
 
     DisposableEffect(hasPermission) {

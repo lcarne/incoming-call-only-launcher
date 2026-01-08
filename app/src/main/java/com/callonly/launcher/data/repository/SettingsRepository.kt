@@ -15,8 +15,11 @@ class SettingsRepository @Inject constructor(
 ) {
     private val prefs: SharedPreferences = context.getSharedPreferences("callonly_prefs", Context.MODE_PRIVATE)
 
-    private val _isAlwaysOnEnabled = MutableStateFlow(prefs.getBoolean(KEY_ALWAYS_ON, true)) // Default True
-    val isAlwaysOnEnabled: StateFlow<Boolean> = _isAlwaysOnEnabled.asStateFlow()
+    private val _screenBehaviorPlugged = MutableStateFlow(prefs.getInt(KEY_SCREEN_BEHAVIOR_PLUGGED, SCREEN_BEHAVIOR_AWAKE))
+    val screenBehaviorPlugged: StateFlow<Int> = _screenBehaviorPlugged.asStateFlow()
+
+    private val _screenBehaviorBattery = MutableStateFlow(prefs.getInt(KEY_SCREEN_BEHAVIOR_BATTERY, SCREEN_BEHAVIOR_OFF))
+    val screenBehaviorBattery: StateFlow<Int> = _screenBehaviorBattery.asStateFlow()
 
     private val _nightModeStartHour = MutableStateFlow(prefs.getInt(KEY_NIGHT_START, 22)) // Default 22h / 10PM
     val nightModeStartHour: StateFlow<Int> = _nightModeStartHour.asStateFlow()
@@ -57,11 +60,19 @@ class SettingsRepository @Inject constructor(
     private val _isDefaultSpeakerEnabled = MutableStateFlow(prefs.getBoolean(KEY_DEFAULT_SPEAKER_ENABLED, true)) // Default True (Speaker)
     val isDefaultSpeakerEnabled: StateFlow<Boolean> = _isDefaultSpeakerEnabled.asStateFlow()
 
+    private val _hasSeenOnboarding = MutableStateFlow(prefs.getBoolean(KEY_HAS_SEEN_ONBOARDING, false))
+    val hasSeenOnboarding: StateFlow<Boolean> = _hasSeenOnboarding.asStateFlow()
 
 
-    fun setAlwaysOnEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_ALWAYS_ON, enabled).apply()
-        _isAlwaysOnEnabled.value = enabled
+
+    fun setScreenBehaviorPlugged(behavior: Int) {
+        prefs.edit().putInt(KEY_SCREEN_BEHAVIOR_PLUGGED, behavior).apply()
+        _screenBehaviorPlugged.value = behavior
+    }
+
+    fun setScreenBehaviorBattery(behavior: Int) {
+        prefs.edit().putInt(KEY_SCREEN_BEHAVIOR_BATTERY, behavior).apply()
+        _screenBehaviorBattery.value = behavior
     }
 
     fun setNightModeStartHour(hour: Int) {
@@ -127,10 +138,16 @@ class SettingsRepository @Inject constructor(
         _isDefaultSpeakerEnabled.value = enabled
     }
 
+    fun setHasSeenOnboarding(hasSeen: Boolean) {
+        prefs.edit().putBoolean(KEY_HAS_SEEN_ONBOARDING, hasSeen).apply()
+        _hasSeenOnboarding.value = hasSeen
+    }
+
+
+
 
 
     companion object {
-        private const val KEY_ALWAYS_ON = "always_on_enabled"
         private const val KEY_NIGHT_START = "night_mode_start"
         private const val KEY_NIGHT_START_MINUTE = "night_mode_start_minute"
         private const val KEY_NIGHT_END = "night_mode_end"
@@ -140,9 +157,16 @@ class SettingsRepository @Inject constructor(
         private const val KEY_ALLOW_ALL_CALLS = "allow_all_calls"
         private const val KEY_RINGER_ENABLED = "ringer_enabled"
         private const val KEY_RINGER_VOLUME = "ringer_volume"
+        private const val KEY_SCREEN_BEHAVIOR_PLUGGED = "screen_behavior_plugged"
+        private const val KEY_SCREEN_BEHAVIOR_BATTERY = "screen_behavior_battery"
+
+        const val SCREEN_BEHAVIOR_OFF = 0
+        const val SCREEN_BEHAVIOR_DIM = 1
+        const val SCREEN_BEHAVIOR_AWAKE = 2
 
         private const val KEY_LANGUAGE = "language"
         private const val KEY_TIME_FORMAT = "time_format"
         private const val KEY_DEFAULT_SPEAKER_ENABLED = "default_speaker_enabled"
+        private const val KEY_HAS_SEEN_ONBOARDING = "has_seen_onboarding"
     }
 }

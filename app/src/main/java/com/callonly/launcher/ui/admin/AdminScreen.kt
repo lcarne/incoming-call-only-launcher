@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -336,6 +337,8 @@ fun AdminSettingsScreen(
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer)
                     ) {
+                        Icon(com.callonly.launcher.ui.theme.StatusIcons.LockOpen, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(id = com.callonly.launcher.R.string.unlock))
                     }
                     
@@ -346,6 +349,8 @@ fun AdminSettingsScreen(
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp)
                     ) {
+                        Icon(com.callonly.launcher.ui.theme.StatusIcons.ArrowBack, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(id = com.callonly.launcher.R.string.back_arrow))
                     }
                 }
@@ -726,7 +731,13 @@ fun ContactDialog(
                     onClick = { showPhotoSourceDialog = true },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                 ) {
-                    Text(if (photoUri != null) stringResource(id = com.callonly.launcher.R.string.photo_selected) else stringResource(id = com.callonly.launcher.R.string.add_photo))
+                    val hasPhoto = photoUri != null
+                    Icon(
+                        if (hasPhoto) androidx.compose.material.icons.Icons.Default.Check else androidx.compose.material.icons.Icons.Default.Add,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (hasPhoto) stringResource(id = com.callonly.launcher.R.string.photo_selected) else stringResource(id = com.callonly.launcher.R.string.add_photo))
                 }
                 
                 if (showPhotoSourceDialog) {
@@ -746,6 +757,8 @@ fun ContactDialog(
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
+                                    Icon(com.callonly.launcher.ui.theme.StatusIcons.PhotoLibrary, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(stringResource(id = com.callonly.launcher.R.string.gallery))
                                 }
                                 Button(
@@ -762,6 +775,8 @@ fun ContactDialog(
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
+                                    Icon(com.callonly.launcher.ui.theme.StatusIcons.PhotoCamera, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(stringResource(id = com.callonly.launcher.R.string.camera))
                                 }
                             }
@@ -799,7 +814,6 @@ fun ContactDialog(
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SettingsSection(viewModel: AdminViewModel) {
-    val isAlwaysOn by viewModel.isAlwaysOnEnabled.collectAsState()
     val isNightModeEnabled by viewModel.isNightModeEnabled.collectAsState()
     val nightStart by viewModel.nightModeStartHour.collectAsState()
     val nightStartMin by viewModel.nightModeStartMinute.collectAsState()
@@ -920,19 +934,76 @@ fun SettingsSection(viewModel: AdminViewModel) {
         Divider(modifier = Modifier.padding(vertical = 16.dp))
         Text(stringResource(id = com.callonly.launcher.R.string.screen_settings), style = MaterialTheme.typography.titleLarge)
         
+        val screenBehaviorPlugged by viewModel.screenBehaviorPlugged.collectAsState()
+        val screenBehaviorBattery by viewModel.screenBehaviorBattery.collectAsState()
+
+        var showPluggedDialog by remember { mutableStateOf(false) }
+        var showBatteryDialog by remember { mutableStateOf(false) }
+
+        // Plugged
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-                Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(id = com.callonly.launcher.R.string.always_on_screen), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(id = com.callonly.launcher.R.string.always_on_desc), style = MaterialTheme.typography.bodySmall)
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                Icon(com.callonly.launcher.ui.theme.StatusIcons.Charging, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(stringResource(id = com.callonly.launcher.R.string.screen_behavior_plugged), style = MaterialTheme.typography.titleMedium)
             }
-            Switch(
-                checked = isAlwaysOn,
-                onCheckedChange = { viewModel.setAlwaysOnEnabled(it) }
-            )
+            Button(onClick = { showPluggedDialog = true }) {
+                Text(
+                    text = when(screenBehaviorPlugged) {
+                        0 -> stringResource(id = com.callonly.launcher.R.string.mode_off)
+                        1 -> stringResource(id = com.callonly.launcher.R.string.mode_dim)
+                        2 -> stringResource(id = com.callonly.launcher.R.string.mode_awake)
+                        else -> ""
+                    }
+                )
+            }
+        }
+        
+        // Battery
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                Icon(com.callonly.launcher.ui.theme.StatusIcons.BatteryFull, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(stringResource(id = com.callonly.launcher.R.string.screen_behavior_battery), style = MaterialTheme.typography.titleMedium)
+            }
+            Button(onClick = { showBatteryDialog = true }) {
+                Text(
+                    text = when(screenBehaviorBattery) {
+                        0 -> stringResource(id = com.callonly.launcher.R.string.mode_off)
+                        1 -> stringResource(id = com.callonly.launcher.R.string.mode_dim)
+                        2 -> stringResource(id = com.callonly.launcher.R.string.mode_awake)
+                        else -> ""
+                    }
+                )
+            }
+        }
+
+        if (showPluggedDialog) {
+             ScreenBehaviorDialog(
+                 title = stringResource(id = com.callonly.launcher.R.string.screen_behavior_plugged),
+                 icon = com.callonly.launcher.ui.theme.StatusIcons.Charging,
+                 currentValue = screenBehaviorPlugged,
+                 onConfirm = { viewModel.setScreenBehaviorPlugged(it); showPluggedDialog = false },
+                 onDismiss = { showPluggedDialog = false }
+             )
+        }
+
+        if (showBatteryDialog) {
+             ScreenBehaviorDialog(
+                 title = stringResource(id = com.callonly.launcher.R.string.screen_behavior_battery),
+                 icon = com.callonly.launcher.ui.theme.StatusIcons.BatteryFull,
+                 currentValue = screenBehaviorBattery,
+                 onConfirm = { viewModel.setScreenBehaviorBattery(it); showBatteryDialog = false },
+                 onDismiss = { showBatteryDialog = false }
+             )
         }
 
         Row(
@@ -1219,6 +1290,83 @@ fun TimePickerDialogWrapper(
         text = {
             androidx.compose.foundation.layout.Box(modifier = androidx.compose.ui.Modifier.fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                 androidx.compose.material3.TimePicker(state = timePickerState)
+            }
+        }
+    )
+}
+
+@Composable
+fun ScreenBehaviorDialog(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    currentValue: Int,
+    onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (icon != null) {
+                    Icon(icon, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                androidx.compose.material3.Text(title)
+            }
+        },
+        text = {
+            Column {
+                // Off
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onConfirm(0) }
+                        .padding(12.dp),
+                     verticalAlignment = Alignment.CenterVertically
+                ) {
+                    androidx.compose.material3.RadioButton(
+                        selected = currentValue == 0,
+                        onClick = { onConfirm(0) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    androidx.compose.material3.Text(stringResource(id = com.callonly.launcher.R.string.mode_off))
+                }
+                // Dim
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onConfirm(1) }
+                        .padding(12.dp),
+                     verticalAlignment = Alignment.CenterVertically
+                ) {
+                    androidx.compose.material3.RadioButton(
+                        selected = currentValue == 1,
+                        onClick = { onConfirm(1) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    androidx.compose.material3.Text(stringResource(id = com.callonly.launcher.R.string.mode_dim))
+                }
+                // Awake
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onConfirm(2) }
+                        .padding(12.dp),
+                     verticalAlignment = Alignment.CenterVertically
+                ) {
+                    androidx.compose.material3.RadioButton(
+                        selected = currentValue == 2,
+                        onClick = { onConfirm(2) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    androidx.compose.material3.Text(stringResource(id = com.callonly.launcher.R.string.mode_awake))
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) {
+                androidx.compose.material3.Text(stringResource(id = com.callonly.launcher.R.string.cancel))
             }
         }
     )

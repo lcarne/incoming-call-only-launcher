@@ -624,4 +624,121 @@ object StatusIcons {
                 curveTo(22.25f, 16.14f, 21.54f, 18.11f, 20.35f, 19.7f)
             }
         }.build()
+    val LockOpen: ImageVector
+        get() = ImageVector.Builder(
+            name = "LockOpen",
+            defaultWidth = 24.0.dp,
+            defaultHeight = 24.0.dp,
+            viewportWidth = 24.0f,
+            viewportHeight = 24.0f
+        ).apply {
+            path(fill = SolidColor(Color.Black), fillAlpha = 1.0f, stroke = null, strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f, strokeLineCap = StrokeCap.Butt, strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f, pathFillType = PathFillType.NonZero) {
+                moveTo(12.0f, 17.0f)
+                curveToRelative(1.1f, 0.0f, 2.0f, -0.9f, 2.0f, -2.0f)
+                reflectiveCurveToRelative(-0.9f, -2.0f, -2.0f, -2.0f)
+                reflectiveCurveToRelative(-2.0f, 0.9f, -2.0f, 2.0f)
+                reflectiveCurveToRelative(0.9f, 2.0f, 2.0f, 2.0f)
+                close()
+                moveTo(18.0f, 8.0f)
+                horizontalLineToRelative(-1.0f)
+                lineTo(17.0f, 6.0f)
+                curveToRelative(0.0f, -2.76f, -2.24f, -5.0f, -5.0f, -5.0f)
+                reflectiveCurveTo(7.0f, 3.24f, 7.0f, 6.0f)
+                horizontalLineToRelative(1.9f)
+                curveToRelative(0.0f, -1.71f, 1.39f, -3.1f, 3.1f, -3.1f)
+                reflectiveCurveToRelative(3.1f, 1.39f, 3.1f, 3.1f)
+                verticalLineToRelative(2.0f)
+                lineTo(6.0f, 8.0f)
+                curveToRelative(-1.1f, 0.0f, -2.0f, 0.9f, -2.0f, 2.0f)
+                verticalLineToRelative(10.0f)
+                curveToRelative(0.0f, 1.1f, 0.9f, 2.0f, 2.0f, 2.0f)
+                horizontalLineToRelative(12.0f)
+                curveToRelative(1.1f, 0.0f, 2.0f, -0.9f, 2.0f, -2.0f)
+                lineTo(20.0f, 10.0f)
+                curveToRelative(0.0f, -1.1f, -0.9f, -2.0f, -2.0f, -2.0f)
+                close()
+                moveTo(18.0f, 20.0f)
+                lineTo(6.0f, 20.0f)
+                lineTo(6.0f, 10.0f)
+                horizontalLineToRelative(12.0f)
+                verticalLineToRelative(10.0f)
+                close()
+            }
+        }.build()
+
+    val PhotoLibrary: ImageVector
+        get() = ImageVector.Builder(
+            name = "PhotoLibrary",
+            defaultWidth = 24.0.dp,
+            defaultHeight = 24.0.dp,
+            viewportWidth = 24.0f,
+            viewportHeight = 24.0f
+        ).apply {
+            path(fill = SolidColor(Color.Black), fillAlpha = 1.0f, stroke = null, strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f, strokeLineCap = StrokeCap.Butt, strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f, pathFillType = PathFillType.NonZero) {
+                moveTo(22.0f, 16.0f)
+                lineTo(22.0f, 4.0f)
+                curveToRelative(0.0f, -1.1f, -0.9f, -2.0f, -2.0f, -2.0f)
+                lineTo(8.0f, 2.0f)
+                curveToRelative(-1.1f, 0.0f, -2.0f, 0.9f, -2.0f, 2.0f)
+                verticalLineToRelative(12.0f)
+                curveToRelative(0.0f, 1.1f, 0.9f, 2.0f, 2.0f, 2.0f)
+                horizontalLineToRelative(12.0f)
+                curveToRelative(1.1f, 0.0f, 2.0f, -0.9f, 2.0f, -2.0f)
+                close()
+                moveTo(11.0f, 12.0f)
+                lineToRelative(2.03f, 2.71f)
+                lineTo(16.0f, 11.0f)
+                lineToRelative(4.0f, 5.0f)
+                lineTo(8.0f, 16.0f)
+                lineToRelative(3.0f, -4.0f)
+                close()
+                moveTo(2.0f, 6.0f)
+                verticalLineToRelative(14.0f)
+                curveToRelative(0.0f, 1.1f, 0.9f, 2.0f, 2.0f, 2.0f)
+                horizontalLineToRelative(14.0f)
+                verticalLineToRelative(-2.0f)
+                lineTo(4.0f, 20.0f)
+                lineTo(4.0f, 6.0f)
+                lineTo(2.0f, 6.0f)
+                close()
+            }
+        }.build()
+
+    val PhotoCamera: ImageVector
+        get() = ImageVector.Builder(
+            name = "PhotoCamera",
+            defaultWidth = 24.0.dp,
+            defaultHeight = 24.0.dp,
+            viewportWidth = 24.0f,
+            viewportHeight = 24.0f
+        ).apply {
+            path(fill = SolidColor(Color.Black), fillAlpha = 1.0f, stroke = null, strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f, strokeLineCap = StrokeCap.Butt, strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f, pathFillType = PathFillType.NonZero) {
+                moveTo(9.0f, 2.0f)
+                lineTo(7.17f, 4.0f)
+                lineTo(4.0f, 4.0f)
+                curveToRelative(-1.1f, 0.0f, -2.0f, 0.9f, -2.0f, 2.0f)
+                verticalLineToRelative(12.0f)
+                curveToRelative(0.0f, 1.1f, 0.9f, 2.0f, 2.0f, 2.0f)
+                horizontalLineToRelative(16.0f)
+                curveToRelative(1.1f, 0.0f, 2.0f, -0.9f, 2.0f, -2.0f)
+                lineTo(22.0f, 6.0f)
+                curveToRelative(0.0f, -1.1f, -0.9f, -2.0f, -2.0f, -2.0f)
+                horizontalLineToRelative(-3.17f)
+                lineTo(15.0f, 2.0f)
+                lineTo(9.0f, 2.0f)
+                close()
+                moveTo(12.0f, 17.0f)
+                curveToRelative(-2.76f, 0.0f, -5.0f, -2.24f, -5.0f, -5.0f)
+                reflectiveCurveToRelative(2.24f, -5.0f, 5.0f, -5.0f)
+                reflectiveCurveToRelative(5.0f, 2.24f, 5.0f, 5.0f)
+                reflectiveCurveToRelative(-2.24f, 5.0f, -5.0f, 5.0f)
+                close()
+            }
+        }.build()
 }

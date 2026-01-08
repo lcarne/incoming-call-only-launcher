@@ -29,7 +29,10 @@ class AdminViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    val isAlwaysOnEnabled = settingsRepository.isAlwaysOnEnabled
+    val isNightModeEnabled = settingsRepository.isNightModeEnabled
+    val screenBehaviorPlugged = settingsRepository.screenBehaviorPlugged
+    val screenBehaviorBattery = settingsRepository.screenBehaviorBattery
+
     val nightModeStartHour = settingsRepository.nightModeStartHour
     val nightModeStartMinute = settingsRepository.nightModeStartMinute
     val nightModeEndHour = settingsRepository.nightModeEndHour
@@ -37,7 +40,6 @@ class AdminViewModel @Inject constructor(
     val allowAllCalls = settingsRepository.allowAllCalls
     val ringerVolume = settingsRepository.ringerVolume
     val isRingerEnabled = settingsRepository.isRingerEnabled
-    val isNightModeEnabled = settingsRepository.isNightModeEnabled
     val language = settingsRepository.language
     val timeFormat = settingsRepository.timeFormat
     val isDefaultSpeakerEnabled = settingsRepository.isDefaultSpeakerEnabled
@@ -108,8 +110,12 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    fun setAlwaysOnEnabled(enabled: Boolean) {
-        settingsRepository.setAlwaysOnEnabled(enabled)
+    fun setScreenBehaviorPlugged(behavior: Int) {
+        settingsRepository.setScreenBehaviorPlugged(behavior)
+    }
+
+    fun setScreenBehaviorBattery(behavior: Int) {
+        settingsRepository.setScreenBehaviorBattery(behavior)
     }
 
     fun setNightModeStartHour(hour: Int) {

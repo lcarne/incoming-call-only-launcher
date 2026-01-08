@@ -20,7 +20,8 @@ class HomeViewModel @Inject constructor(
     private val screenManager: com.callonly.launcher.manager.ScreenManager
 ) : ViewModel() {
 
-    val isAlwaysOnEnabled = settingsRepository.isAlwaysOnEnabled
+    val screenBehaviorPlugged = settingsRepository.screenBehaviorPlugged
+    val screenBehaviorBattery = settingsRepository.screenBehaviorBattery
     val nightModeStartHour = settingsRepository.nightModeStartHour
     val nightModeStartMinute = settingsRepository.nightModeStartMinute
     val nightModeEndHour = settingsRepository.nightModeEndHour
@@ -29,20 +30,38 @@ class HomeViewModel @Inject constructor(
     val isRingerEnabled = settingsRepository.isRingerEnabled
     val timeFormat = settingsRepository.timeFormat
     val isNightModeEnabled = settingsRepository.isNightModeEnabled
+    val hasSeenOnboarding = settingsRepository.hasSeenOnboarding
 
 
     private val _isDefaultDialer = MutableStateFlow(true)
     val isDefaultDialer = _isDefaultDialer.asStateFlow()
 
-    fun refreshDialerStatus(context: Context) {
-        val isDefault = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    private val _isDefaultLauncher = MutableStateFlow(true)
+    val isDefaultLauncher = _isDefaultLauncher.asStateFlow()
+
+    fun refreshDefaultAppStatus(context: Context) {
+        // Check Dialer
+        val isDefaultDialer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = context.getSystemService(Context.ROLE_SERVICE) as RoleManager
             roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
         } else {
             val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             telecomManager.defaultDialerPackage == context.packageName
         }
-        _isDefaultDialer.value = isDefault
+        _isDefaultDialer.value = isDefaultDialer
+
+        // Check Launcher
+        val isDefaultLauncher = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val roleManager = context.getSystemService(Context.ROLE_SERVICE) as RoleManager
+            roleManager.isRoleHeld(RoleManager.ROLE_HOME)
+        } else {
+            val intent = android.content.Intent(android.content.Intent.ACTION_MAIN)
+            intent.addCategory(android.content.Intent.CATEGORY_HOME)
+            val resolveInfo = context.packageManager.resolveActivity(intent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+            val currentLauncherPackage = resolveInfo?.activityInfo?.packageName
+            currentLauncherPackage == context.packageName
+        }
+        _isDefaultLauncher.value = isDefaultLauncher
     }
 
     fun setRingerEnabled(enabled: Boolean) {
@@ -51,5 +70,9 @@ class HomeViewModel @Inject constructor(
 
     fun wakeUpScreen() {
         screenManager.wakeUpScreen()
+    }
+
+    fun markOnboardingSeen() {
+        settingsRepository.setHasSeenOnboarding(true)
     }
 }
