@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -128,7 +129,9 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context) {
         // Read saved language directly from prefs to apply before UI is created
         val prefs = newBase.getSharedPreferences("callonly_prefs", MODE_PRIVATE)
-        val lang = prefs.getString("language", "fr") ?: "fr"
+        val sysLocale = android.content.res.Resources.getSystem().configuration.locales[0]
+        val defaultLang = if (sysLocale.language == "fr") "fr" else "en"
+        val lang = prefs.getString("language", defaultLang) ?: defaultLang
         val locale = if (lang == "en") Locale.ENGLISH else Locale("fr")
         val context = updateLocale(newBase, locale)
         super.attachBaseContext(context)
@@ -165,7 +168,7 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "SIM VERROUILLÉE",
+                    text = stringResource(R.string.sim_locked_title),
                     style = MaterialTheme.typography.headlineLarge,
                     color = com.callonly.launcher.ui.theme.White,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -174,7 +177,7 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Veuillez saisir le code PIN de la carte SIM pour continuer.",
+                    text = stringResource(R.string.sim_locked_message),
                     style = MaterialTheme.typography.bodyLarge,
                     color = com.callonly.launcher.ui.theme.LightGray,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -190,7 +193,7 @@ class MainActivity : ComponentActivity() {
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.callonly.launcher.ui.theme.HighContrastButtonBg)
                 ) {
                     Text(
-                        "DÉVERROUILLER",
+                        stringResource(R.string.sim_unlock_button),
                         fontSize = 32.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                     )
@@ -292,10 +295,12 @@ class MainActivity : ComponentActivity() {
 
             // STRICT KIOSK: Disable Status Bar and all Lock Task Features (Home, Notifications, etc.)
             try {
-                dpm.setLockTaskFeatures(
-                    adminComponent,
-                    android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_NONE
-                )
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    dpm.setLockTaskFeatures(
+                        adminComponent,
+                        android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_NONE
+                    )
+                }
                 dpm.setStatusBarDisabled(adminComponent, true)
             } catch (e: SecurityException) {
                 e.printStackTrace()

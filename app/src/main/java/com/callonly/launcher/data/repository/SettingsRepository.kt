@@ -57,8 +57,12 @@ class SettingsRepository @Inject constructor(
     private val _ringerVolume = MutableStateFlow(prefs.getInt(KEY_RINGER_VOLUME, 80)) // 0-100
     val ringerVolume: StateFlow<Int> = _ringerVolume.asStateFlow()
 
+    private val _preNightRingerEnabled = MutableStateFlow(prefs.getBoolean(KEY_PRE_NIGHT_RINGER_ENABLED, true))
+    val preNightRingerEnabled: StateFlow<Boolean> = _preNightRingerEnabled.asStateFlow()
 
-    private val _language = MutableStateFlow(prefs.getString(KEY_LANGUAGE, "fr") ?: "fr")
+
+    private val defaultLang = if (android.content.res.Resources.getSystem().configuration.locales[0].language == "fr") "fr" else "en"
+    private val _language = MutableStateFlow(prefs.getString(KEY_LANGUAGE, defaultLang) ?: defaultLang)
     val language: StateFlow<String> = _language.asStateFlow()
 
     private val _timeFormat = MutableStateFlow(prefs.getString(KEY_TIME_FORMAT, "24") ?: "24")
@@ -133,6 +137,16 @@ class SettingsRepository @Inject constructor(
         prefs.edit().putInt(KEY_RINGER_VOLUME, volume).apply()
     }
 
+    fun saveRingerStatePreNight(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_PRE_NIGHT_RINGER_ENABLED, enabled).apply()
+        _preNightRingerEnabled.value = enabled
+    }
+
+    fun restoreRingerStatePreNight() {
+        val restoredValue = prefs.getBoolean(KEY_PRE_NIGHT_RINGER_ENABLED, true)
+        setRingerEnabled(restoredValue)
+    }
+
 
     fun setLanguage(lang: String) {
         prefs.edit().putString(KEY_LANGUAGE, lang).apply()
@@ -172,6 +186,7 @@ class SettingsRepository @Inject constructor(
         const val SCREEN_BEHAVIOR_DIM = 1
         const val SCREEN_BEHAVIOR_AWAKE = 2
 
+        private const val KEY_PRE_NIGHT_RINGER_ENABLED = "pre_night_ringer_enabled"
         private const val KEY_LANGUAGE = "language"
         private const val KEY_TIME_FORMAT = "time_format"
         private const val KEY_DEFAULT_SPEAKER_ENABLED = "default_speaker_enabled"

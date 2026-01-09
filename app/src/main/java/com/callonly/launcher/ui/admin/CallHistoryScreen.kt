@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -123,6 +124,7 @@ fun CallHistoryScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallLogItem(log: CallLog) {
     val sdf = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
@@ -154,53 +156,53 @@ fun CallLogItem(log: CallLog) {
         )
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = androidx.compose.ui.res.painterResource(id = iconRes),
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(32.dp)
-        )
-
-        Column(modifier = Modifier.weight(1f)) {
+    ListItem(
+        leadingContent = {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = iconRes),
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(24.dp)
+            )
+        },
+        headlineContent = {
             Text(
                 text = log.name ?: log.number,
                 style = MaterialTheme.typography.titleMedium
             )
-            if (log.name != null) {
-                Text(
-                    text = log.number,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = color
-                )
-                if (log.durationSeconds > 0) {
+        },
+        supportingContent = {
+            Column {
+                if (log.name != null) {
                     Text(
-                        text = " • ${formatDuration(log.durationSeconds)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray
+                        text = log.number,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = color
+                    )
+                    if (log.durationSeconds > 0) {
+                        Text(
+                            text = " • ${formatDuration(log.durationSeconds)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
             }
+        },
+        trailingContent = {
+            Text(
+                text = dateStr,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
         }
-
-        Text(
-            text = dateStr,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
-        )
-    }
+    )
 }
 
 private fun formatDuration(seconds: Long): String {

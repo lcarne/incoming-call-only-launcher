@@ -99,7 +99,16 @@
     <string name="select_hour">Choisir l\'heure</string>
     <string name="settings">Paramètres</string>
     <string name="settings_language_section_title">Langue</string>
+    <string name="settings_section_content">Contenu</string>
+    <string name="settings_section_display_power">Affichage &amp; Alimentation</string>
+    <string name="settings_section_localization">Localisation</string>
+    <string name="settings_section_system">Système</string>
+    <string name="signal_level_desc">Niveau du signal</string>
+    <string name="sim_locked_message">Veuillez saisir le code PIN de la carte SIM pour continuer.</string>
+    <string name="sim_locked_title">SIM VERROUILLÉE</string>
+    <string name="sim_unlock_button">DÉVERROUILLER</string>
     <string name="speaker">HAUT\nPARLEUR</string>
+    <string name="take_photo">Prendre une photo</string>
     <string name="taps_remaining">%1$d more tap</string>
     <string name="test_ringer">Test Ringer</string>
     <string name="time_format_12">AM/PM</string>
@@ -109,6 +118,4 @@
     <string name="unlock">Déverrouiller</string>
     <string name="validate">Valider</string>
     <string name="welcome_message">Ce launcher permet de recevoir des appels uniquement (pas d\'appels sortants). Il peut être configuré pour accepter les appels de n\'importe qui ou uniquement de vos contacts.</string>
-    <string name="take_photo">Prendre une photo</string>
-    <string name="signal_level_desc">Niveau du signal</string>
 </resources>

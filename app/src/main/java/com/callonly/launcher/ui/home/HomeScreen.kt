@@ -14,12 +14,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,17 +36,18 @@ import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.callonly.launcher.R
 import com.callonly.launcher.ui.components.BatteryLevelDisplay
 import com.callonly.launcher.ui.components.NetworkSignalDisplay
+import com.callonly.launcher.ui.onboarding.OnboardingFlow
+import com.callonly.launcher.ui.theme.Black
 import com.callonly.launcher.ui.theme.HighContrastButtonBg
+import com.callonly.launcher.ui.theme.White
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -74,10 +72,12 @@ fun HomeScreen(
     val isNightModeEnabled by viewModel.isNightModeEnabled.collectAsState()
     val savedClockColor by viewModel.clockColor.collectAsState()
     val hasSeenOnboarding by viewModel.hasSeenOnboarding.collectAsState()
+    val isRingerEnabled by viewModel.isRingerEnabled.collectAsState()
 
     val clockColor = if (savedClockColor != 0) Color(savedClockColor) else HighContrastButtonBg
 
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     // Contacts removed from Home Screen as requested
 
     // Fake Sleep Logic
@@ -217,37 +217,61 @@ fun HomeScreen(
     }
 
 
-    // Force Ringer OFF when Night Mode is active
+    // Force Ringer OFF when Night Mode is active and RESTORE when it ends
+    var previousIsNightForRinger by remember { mutableStateOf(isNight) }
     LaunchedEffect(isNight) {
         if (isNight) {
+            // Save current state only if we are transitioning from day to night
+            if (!previousIsNightForRinger) {
+                viewModel.saveRingerStatePreNight(isRingerEnabled)
+            }
             viewModel.setRingerEnabled(false)
+        } else {
+            // Restore state when transitioning from night back to day
+            if (previousIsNightForRinger) {
+                viewModel.restoreRingerStatePreNight()
+            }
+        }
+        previousIsNightForRinger = isNight
+    }
+
+    // Reliable Time Update using BroadcastReceiver
+    DisposableEffect(context, lifecycleOwner) {
+        val receiver = object : android.content.BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                currentTime = Date()
+            }
+        }
+        val filter = android.content.IntentFilter().apply {
+            addAction(Intent.ACTION_TIME_TICK)
+            addAction(Intent.ACTION_TIME_CHANGED)
+            addAction(Intent.ACTION_TIMEZONE_CHANGED)
+        }
+        context.registerReceiver(receiver, filter)
+
+        // Also update immediately on resume to catch up after sleep
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                currentTime = Date()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            context.unregisterReceiver(receiver)
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentTime = Date()
-            val clockCalendar = java.util.Calendar.getInstance()
-            val seconds = clockCalendar.get(java.util.Calendar.SECOND)
-            delay((60 - seconds) * 1000L)
-        }
-    }
+    // Format Logic moved to ClockDisplay
 
-    val timeFormatPattern = remember {
-        mutableStateOf("HH:mm")
-    }
-    val savedFormat by viewModel.timeFormat.collectAsState()
-    LaunchedEffect(savedFormat) {
-        timeFormatPattern.value = if (savedFormat == "12") "hh:mm a" else "HH:mm"
-    }
-    val timeFormat = SimpleDateFormat(timeFormatPattern.value, Locale.getDefault())
     val dateFormat = SimpleDateFormat("EEEE d MMMM yyyy", Locale.getDefault())
 
     // High Contrast / Black Background
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(com.callonly.launcher.ui.theme.Black)
+            .background(Black)
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
@@ -285,32 +309,6 @@ fun HomeScreen(
                     BatteryLevelDisplay()
                 }
 
-                // DEMO: Display all battery icons
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    val icons = listOf(
-                        com.callonly.launcher.R.drawable.ic_battery_full,
-                        com.callonly.launcher.R.drawable.ic_battery_80,
-                        com.callonly.launcher.R.drawable.ic_battery_50,
-                        com.callonly.launcher.R.drawable.ic_battery_20,
-                        com.callonly.launcher.R.drawable.ic_battery_alert
-                    )
-
-                    icons.forEach { iconRes ->
-                        Icon(
-                            painter = androidx.compose.ui.res.painterResource(id = iconRes),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(horizontal = 8.dp),
-                            tint = Color.Unspecified
-                        )
-                    }
-                }
 
                 // Date
                 val rawDate = dateFormat.format(currentTime)
@@ -326,7 +324,7 @@ fun HomeScreen(
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = com.callonly.launcher.ui.theme.White,
+                    color = White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.pointerInput(Unit) {
                         detectTapGestures(
@@ -348,108 +346,34 @@ fun HomeScreen(
                     }
                 )
 
-                if (savedFormat == "12") {
-                    val timeOnly =
-                        SimpleDateFormat("hh:mm", Locale.getDefault()).format(currentTime)
-                    val ampm = SimpleDateFormat("a", Locale.getDefault()).format(currentTime)
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = timeOnly,
-                            style = MaterialTheme.typography.displayLarge.copy(fontSize = 120.sp),
-                            color = clockColor,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = ampm,
-                            style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
-                            color = clockColor,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                } else {
-                    Text(
-                        text = timeFormat.format(currentTime),
-                        style = MaterialTheme.typography.displayLarge.copy(fontSize = 120.sp),
-                        color = clockColor,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                // Clock
+                val savedFormat by viewModel.timeFormat.collectAsState()
+                ClockDisplay(
+                    currentTime = currentTime,
+                    timeFormat = savedFormat,
+                    clockColor = clockColor
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Ringer Toggle Button
-                val isRingerEnabled by viewModel.isRingerEnabled.collectAsState()
 
-                androidx.compose.material3.FilledTonalButton(
-                    onClick = {
-                        if (!isNight) {
-                            viewModel.setRingerEnabled(!isRingerEnabled)
-                        }
-                    },
-                    modifier = Modifier
-                        .width(300.dp)
-                        .height(160.dp), // Increased to 160.dp to accommodate 3-line English text
-                    enabled = !isNight, // Optional: visually disable it, or keep enabled but show "Action not allowed" toast. User asked for "pas possible de passer en mode active"
-                    colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
-                        containerColor = if (isNight) com.callonly.launcher.ui.theme.ErrorRed.copy(
-                            alpha = 0.5f
-                        ) else if (isRingerEnabled) clockColor else com.callonly.launcher.ui.theme.ErrorRed,
-                        contentColor = if (isNight) com.callonly.launcher.ui.theme.White.copy(alpha = 0.5f) else if (isRingerEnabled) com.callonly.launcher.ui.theme.Black else com.callonly.launcher.ui.theme.White,
-                        disabledContainerColor = com.callonly.launcher.ui.theme.ErrorRed.copy(alpha = 0.3f), // If we use enabled=false
-                        disabledContentColor = com.callonly.launcher.ui.theme.White.copy(alpha = 0.5f)
-                    ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(32.dp)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        if (isNight) {
-                            Icon(
-                                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_volume_off),
-                                contentDescription = null,
-                                modifier = Modifier.size(48.dp) // Reduced from 56.dp to save vertical space
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(
-                                    id = com.callonly.launcher.R.string.night_mode_active_ringer_off,
-                                    String.format("%02dh%02d", nightStart, nightStartMin),
-                                    String.format("%02dh%02d", nightEnd, nightEndMin)
-                                ),
-                                fontSize = 18.sp, // Slightly increased
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                lineHeight = 20.sp
-                            )
-                        } else {
-                            Icon(
-                                painter = androidx.compose.ui.res.painterResource(
-                                    id = if (isRingerEnabled) R.drawable.ic_volume_up else R.drawable.ic_volume_off
-                                ),
-                                contentDescription = null,
-                                modifier = Modifier.size(56.dp) // Increased from 40.dp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = if (isRingerEnabled) stringResource(id = com.callonly.launcher.R.string.ringer_active) else stringResource(
-                                    id = com.callonly.launcher.R.string.ringer_disabled
-                                ),
-                                fontSize = 24.sp, // Increased from 20.sp
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
+                RingerControl(
+                    isNight = isNight,
+                    isRingerEnabled = isRingerEnabled,
+                    nightStart = nightStart,
+                    nightStartMin = nightStartMin,
+                    nightEnd = nightEnd,
+                    nightEndMin = nightEndMin,
+                    accentColor = clockColor,
+                    onToggleRinger = { viewModel.setRingerEnabled(!isRingerEnabled) }
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // Default Dialer & Launcher Check
                 val isDefaultDialer by viewModel.isDefaultDialer.collectAsState()
                 val isDefaultLauncher by viewModel.isDefaultLauncher.collectAsState()
-                val lifecycleOwner = LocalLifecycleOwner.current
 
                 DisposableEffect(lifecycleOwner) {
                     val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
@@ -468,66 +392,10 @@ fun HomeScreen(
                     viewModel.refreshDefaultAppStatus(context)
                 }
 
-                if (!isDefaultDialer) {
-                    val dialerLauncher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.StartActivityForResult(),
-                        onResult = { }
-                    )
-
-                    Button(
-                        onClick = {
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                                val roleManager =
-                                    context.getSystemService(Context.ROLE_SERVICE) as android.app.role.RoleManager
-                                val intent =
-                                    roleManager.createRequestRoleIntent(android.app.role.RoleManager.ROLE_DIALER)
-                                dialerLauncher.launch(intent)
-                            } else {
-                                val intent =
-                                    Intent(android.telecom.TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).apply {
-                                        putExtra(
-                                            android.telecom.TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
-                                            context.packageName
-                                        )
-                                    }
-                                dialerLauncher.launch(intent)
-                            }
-                        },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = com.callonly.launcher.ui.theme.ErrorRed
-                        ),
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            stringResource(id = com.callonly.launcher.R.string.activate_calls),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
-                if (!isDefaultLauncher) {
-                    Button(
-                        onClick = {
-                            val intent = Intent(android.provider.Settings.ACTION_HOME_SETTINGS)
-                            if (intent.resolveActivity(context.packageManager) != null) {
-                                context.startActivity(intent)
-                            } else {
-                                context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
-                            }
-                        },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = com.callonly.launcher.ui.theme.ErrorRed
-                        ),
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            stringResource(id = com.callonly.launcher.R.string.activate_launcher),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                DefaultAppPrompts(
+                    isDefaultDialer = isDefaultDialer,
+                    isDefaultLauncher = isDefaultLauncher
+                )
             }
         } else {
             // DIMMED VIEW - Only Clock
@@ -536,31 +404,13 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (savedFormat == "12") {
-                    val timeOnly =
-                        SimpleDateFormat("hh:mm", Locale.getDefault()).format(currentTime)
-                    val ampm = SimpleDateFormat("a", Locale.getDefault()).format(currentTime)
-                    Text(
-                        text = timeOnly,
-                        style = MaterialTheme.typography.displayLarge.copy(fontSize = 120.sp),
-                        color = Color(0xFFB4BEB0), // Dimmed color
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = ampm,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
-                        color = Color(0xFFB4BEB0),
-                        textAlign = TextAlign.Center
-                    )
-                } else {
-                    Text(
-                        text = timeFormat.format(currentTime),
-                        style = MaterialTheme.typography.displayLarge.copy(fontSize = 120.sp),
-                        color = Color(0xFFB4BEB0), // Dimmed color
-                        textAlign = TextAlign.Center
-                    )
-                }
+                // Dimmed Clock
+                 val savedFormat by viewModel.timeFormat.collectAsState()
+                 ClockDisplay(
+                    currentTime = currentTime,
+                    timeFormat = savedFormat,
+                    clockColor = Color(0xFFB4BEB0)
+                )
             }
         }
 
@@ -569,168 +419,6 @@ fun HomeScreen(
             OnboardingFlow(
                 onDismiss = { viewModel.markOnboardingSeen() }
             )
-        }
-    }
-}
-
-@Composable
-fun OnboardingFlow(onDismiss: () -> Unit) {
-    var step by remember { mutableStateOf(0) }
-
-    // 0: Presentation
-    // 1: Authorization Requests Explanation
-    // 2: Request Contacts
-    // 3: Request Phone State
-    // 4: Location Explanation
-    // 5: Request Location
-    // 6: Admin Explanation
-
-    // Permission Launchers
-    // We proceed to next step regardless of result to avoid blocking the user
-    // Ideally user should grant them, but we can't force them infinitely here without bad UX
-    val contactLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { _ -> step++ }
-    )
-    
-    val phoneLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { _ -> step++ }
-    )
-
-    val locationLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { _ -> step++ }
-    )
-
-    AlertDialog(
-        onDismissRequest = { /* Prevent dismissal */ },
-        title = {
-            Text(
-                text = stringResource(id = when (step) {
-                    0 -> com.callonly.launcher.R.string.onboarding_presentation_title
-                    1 -> com.callonly.launcher.R.string.onboarding_auth_intro_title
-                    2 -> com.callonly.launcher.R.string.onboarding_auth_contacts_title
-                    3 -> com.callonly.launcher.R.string.onboarding_auth_calls_title
-                    4 -> com.callonly.launcher.R.string.onboarding_auth_location_intro_title
-                    5 -> com.callonly.launcher.R.string.onboarding_auth_location_request_title
-                    else -> com.callonly.launcher.R.string.onboarding_admin_intro_title
-                }),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Column {
-                Text(
-                    text = parseBoldString(stringResource(id = when (step) {
-                        0 -> com.callonly.launcher.R.string.onboarding_presentation_message
-                        1 -> com.callonly.launcher.R.string.onboarding_auth_intro_message
-                        2 -> com.callonly.launcher.R.string.onboarding_auth_contacts_message
-                        3 -> com.callonly.launcher.R.string.onboarding_auth_calls_message
-                        4 -> com.callonly.launcher.R.string.onboarding_auth_location_intro_message
-                        5 -> com.callonly.launcher.R.string.onboarding_auth_location_request_message
-                        else -> com.callonly.launcher.R.string.onboarding_admin_intro_message
-                    })),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontSize = 18.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (step == 6) {
-                    Text(
-                        text = stringResource(id = com.callonly.launcher.R.string.onboarding_important),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = com.callonly.launcher.ui.theme.ErrorRed,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            if (step == 6) {
-                // Final Step Logic (Double Tap)
-                var tapCount by remember { mutableStateOf(0) }
-
-                LaunchedEffect(tapCount) {
-                    if (tapCount > 0) {
-                        delay(2000)
-                        if (tapCount == 1) {
-                            tapCount = 0
-                        }
-                    }
-                }
-
-                Button(
-                    onClick = {
-                        if (tapCount == 0) {
-                            tapCount++
-                        } else {
-                            onDismiss()
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = if (tapCount == 0) MaterialTheme.colorScheme.primary else com.callonly.launcher.ui.theme.ConfirmGreen
-                    )
-                ) {
-                    Text(
-                        text = if (tapCount == 0) stringResource(id = com.callonly.launcher.R.string.understood) else stringResource(
-                            id = com.callonly.launcher.R.string.press_again_to_confirm
-                        ),
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 16.sp
-                    )
-                }
-            } else {
-                Button(
-                    onClick = {
-                        when (step) {
-                            0, 1, 4 -> step++
-                            2 -> contactLauncher.launch(android.Manifest.permission.READ_CONTACTS)
-                            3 -> {
-                                val permissions = mutableListOf(
-                                    android.Manifest.permission.READ_PHONE_STATE,
-                                    android.Manifest.permission.ANSWER_PHONE_CALLS
-                                )
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                                    permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                phoneLauncher.launch(permissions.toTypedArray())
-                            }
-                            5 -> locationLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = if (step in listOf(2, 3, 5)) com.callonly.launcher.R.string.validate else com.callonly.launcher.R.string.next),
-                        fontSize = 18.sp
-                    )
-                }
-            }
-        },
-        modifier = Modifier.padding(16.dp)
-    )
-}
-
-@Composable
-fun parseBoldString(text: String): androidx.compose.ui.text.AnnotatedString {
-    return buildAnnotatedString {
-        val parts = text.split("*")
-        parts.forEachIndexed { index, part ->
-            if (index % 2 == 1) { // Odd indices are inside * *
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(part)
-                }
-            } else {
-                append(part)
-            }
         }
     }
 }

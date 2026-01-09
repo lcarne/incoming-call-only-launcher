@@ -113,7 +113,7 @@ fun BatteryLevelDisplay(
                     fontSize = fontSize,
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                 ),
-                color = LightGray
+                color = Color.LightGray
             )
         }
     }
@@ -193,7 +193,7 @@ fun NetworkSignalDisplay(
     Icon(
         painter = androidx.compose.ui.res.painterResource(id = iconRes),
         contentDescription = stringResource(id = R.string.signal_level_desc),
-        tint = LightGray,
+        tint = Color.LightGray,
         modifier = modifier.size(iconSize)
     )
 }

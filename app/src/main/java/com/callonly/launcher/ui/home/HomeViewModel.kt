@@ -67,6 +67,14 @@ class HomeViewModel @Inject constructor(
         settingsRepository.setRingerEnabled(enabled)
     }
 
+    fun saveRingerStatePreNight(enabled: Boolean) {
+        settingsRepository.saveRingerStatePreNight(enabled)
+    }
+
+    fun restoreRingerStatePreNight() {
+        settingsRepository.restoreRingerStatePreNight()
+    }
+
     fun wakeUpScreen() {
         screenManager.wakeUpScreen()
     }
