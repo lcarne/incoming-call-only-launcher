@@ -71,12 +71,12 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
         icon = {
             androidx.compose.material3.Icon(
                 imageVector = when (step) {
-                    0 -> androidx.compose.material.icons.Icons.Default.Info
-                    1, 6 -> androidx.compose.material.icons.Icons.Default.Lock
-                    2 -> androidx.compose.material.icons.Icons.Default.Person
-                    3 -> androidx.compose.material.icons.Icons.Default.Phone
-                    4, 5 -> androidx.compose.material.icons.Icons.Default.LocationOn
-                    else -> androidx.compose.material.icons.Icons.Default.Info
+                    0 -> Icons.Default.Info
+                    1, 6 -> Icons.Default.Lock
+                    2 -> Icons.Default.Person
+                    3 -> Icons.Default.Phone
+                    4, 5 -> Icons.Default.LocationOn
+                    else -> Icons.Default.Info
                 },
                 contentDescription = null
             )

@@ -183,7 +183,7 @@ fun CallLayout(
             if (isRinging) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = stringResource(id = com.callonly.launcher.R.string.incoming_call),
+                    text = stringResource(id = R.string.incoming_call),
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.LightGray,
                     fontWeight = FontWeight.Bold,
@@ -208,7 +208,7 @@ fun CallLayout(
                     if (tapsRemaining < 2) {
                         Text(
                             text = stringResource(
-                                id = com.callonly.launcher.R.string.taps_remaining,
+                                id = R.string.taps_remaining,
                                 tapsRemaining
                             ),
                             color = Color.White,
@@ -242,7 +242,7 @@ fun CallLayout(
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        text = stringResource(id = com.callonly.launcher.R.string.refuse),
+                        text = stringResource(id = R.string.refuse),
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.Red,
                         fontWeight = FontWeight.Bold
@@ -266,7 +266,7 @@ fun CallLayout(
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        text = stringResource(id = com.callonly.launcher.R.string.answer),
+                        text = stringResource(id = R.string.answer),
                         style = MaterialTheme.typography.headlineMedium,
                         color = Color.Green,
                         fontWeight = FontWeight.Black
@@ -279,7 +279,7 @@ fun CallLayout(
                 if (tapsRemaining < 2) {
                     Text(
                         text = stringResource(
-                            id = com.callonly.launcher.R.string.press_again,
+                            id = R.string.press_again,
                             tapsRemaining
                         ),
                         color = Color.White,
@@ -314,7 +314,7 @@ fun CallLayout(
                 }
                 Spacer(Modifier.height(8.dp)) // Reduced from 16.dp
                 Text(
-                    text = stringResource(id = com.callonly.launcher.R.string.hang_up),
+                    text = stringResource(id = R.string.hang_up),
                     style = MaterialTheme.typography.displaySmall,
                     color = Color.Red,
                     fontWeight = FontWeight.ExtraBold
@@ -351,7 +351,7 @@ fun CallLayout(
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = stringResource(id = com.callonly.launcher.R.string.earpiece),
+                        text = stringResource(id = R.string.earpiece),
                         style = MaterialTheme.typography.titleLarge,
                         color = if (!isSpeakerOn) Color(0xFF2196F3) else Color.White,
                         fontWeight = FontWeight.Bold,
@@ -378,7 +378,7 @@ fun CallLayout(
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = stringResource(id = com.callonly.launcher.R.string.speaker),
+                        text = stringResource(id = R.string.speaker),
                         style = MaterialTheme.typography.titleLarge,
                         color = if (isSpeakerOn) Color.Green else Color.White,
                         fontWeight = FontWeight.Bold,

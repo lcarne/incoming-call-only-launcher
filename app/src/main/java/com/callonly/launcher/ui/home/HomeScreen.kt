@@ -2,8 +2,6 @@ package com.callonly.launcher.ui.home
 
 import android.content.Context
 import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,19 +32,19 @@ import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.callonly.launcher.R
 import com.callonly.launcher.ui.components.BatteryLevelDisplay
 import com.callonly.launcher.ui.components.NetworkSignalDisplay
+import com.callonly.launcher.ui.home.components.ClockDisplay
+import com.callonly.launcher.ui.home.components.DefaultAppPrompts
+import com.callonly.launcher.ui.home.components.RingerControl
 import com.callonly.launcher.ui.onboarding.OnboardingFlow
 import com.callonly.launcher.ui.theme.Black
 import com.callonly.launcher.ui.theme.HighContrastButtonBg
 import com.callonly.launcher.ui.theme.White
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -405,8 +401,8 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 // Dimmed Clock
-                 val savedFormat by viewModel.timeFormat.collectAsState()
-                 ClockDisplay(
+                val savedFormat by viewModel.timeFormat.collectAsState()
+                ClockDisplay(
                     currentTime = currentTime,
                     timeFormat = savedFormat,
                     clockColor = Color(0xFFB4BEB0)

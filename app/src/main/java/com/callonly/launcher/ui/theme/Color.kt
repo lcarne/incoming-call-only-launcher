@@ -75,3 +75,5 @@ val PrimaryBlue = md_theme_light_primary
 val ErrorRed = md_theme_light_error
 val ConfirmGreen = Color(0xFF4CAF50) // Kept as custom
 val HighContrastButtonBg = PrimaryBlue
+val DarkGray = Color(0xFF333333)
+val Red = ErrorRed

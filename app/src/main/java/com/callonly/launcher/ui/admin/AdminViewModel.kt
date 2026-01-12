@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.callonly.launcher.data.model.Contact
 import com.callonly.launcher.data.repository.CallLogRepository
 import com.callonly.launcher.data.repository.ContactRepository
+import com.callonly.launcher.data.repository.SettingsRepository
+import com.callonly.launcher.util.ImageStorageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,10 +19,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val repository: ContactRepository,
-    private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository,
+    private val settingsRepository: SettingsRepository,
     private val callLogRepository: CallLogRepository,
-    private val imageStorageManager: com.callonly.launcher.util.ImageStorageManager,
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
+    private val imageStorageManager: ImageStorageManager,
+    @ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     val contacts = repository.getAllContacts()
@@ -214,6 +217,13 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    private val _importExportState = MutableStateFlow<com.callonly.launcher.util.Result<String>?>(null)
+    val importExportState = _importExportState.asStateFlow()
+
+    fun resetImportExportState() {
+        _importExportState.value = null
+    }
+
     override fun onCleared() {
         super.onCleared()
         if (currentRingtone?.isPlaying == true) {
@@ -223,26 +233,32 @@ class AdminViewModel @Inject constructor(
 
     fun exportContacts(uri: android.net.Uri) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            _importExportState.value = com.callonly.launcher.util.Result.Loading
             try {
                 val json = repository.exportContacts()
                 context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     outputStream.write(json.toByteArray())
                 }
+                _importExportState.value = com.callonly.launcher.util.Result.Success("Contacts exported successfully")
             } catch (e: Exception) {
                 e.printStackTrace()
+                _importExportState.value = com.callonly.launcher.util.Result.Error(e, "Failed to export contacts")
             }
         }
     }
 
     fun importContacts(uri: android.net.Uri) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            _importExportState.value = com.callonly.launcher.util.Result.Loading
             try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     val json = inputStream.bufferedReader().use { it.readText() }
-                    repository.importContacts(json)
+                    val count = repository.importContacts(json)
+                    _importExportState.value = com.callonly.launcher.util.Result.Success("$count contacts imported successfully")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                _importExportState.value = com.callonly.launcher.util.Result.Error(e, "Failed to import contacts")
             }
         }
     }

@@ -118,4 +118,6 @@
     <string name="unlock">Déverrouiller</string>
     <string name="validate">Valider</string>
     <string name="welcome_message">Ce launcher permet de recevoir des appels uniquement (pas d\'appels sortants). Il peut être configuré pour accepter les appels de n\'importe qui ou uniquement de vos contacts.</string>
+    <string name="warning_not_dialer">ATTENTION: Ce launcher n\'est pas le dialer par défaut. Les appels risquent de ne pas fonctionner.</string>
+    <string name="warning_not_launcher">ATTENTION: Ce launcher n\'est pas le launcher par défaut. Certaines fonctionnalités risquent de ne pas fonctionner.</string>
 </resources>

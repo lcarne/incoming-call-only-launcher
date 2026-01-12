@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Build
 import android.telecom.TelecomManager
 import androidx.lifecycle.ViewModel
+import com.callonly.launcher.data.repository.SettingsRepository
+import com.callonly.launcher.manager.ScreenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,8 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val settingsRepository: com.callonly.launcher.data.repository.SettingsRepository,
-    private val screenManager: com.callonly.launcher.manager.ScreenManager
+    private val settingsRepository: SettingsRepository,
+    private val screenManager: ScreenManager
 ) : ViewModel() {
 
     val screenBehaviorPlugged = settingsRepository.screenBehaviorPlugged
