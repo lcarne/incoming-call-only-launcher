@@ -15,7 +15,10 @@
     <string name="understood">Compris</string>
     <string name="unlock">Déverrouiller</string>
     <string name="validate">Valider</string>
-    <string name="press_again">Appuyez encore %1$d fois</string>
+    <plurals name="press_again">
+        <item quantity="one">Appuyez encore %1$d fois</item>
+        <item quantity="other">Appuyez encore %1$d fois</item>
+    </plurals>
     <string name="press_again_to_confirm">Appuyez à nouveau pour confirmer</string>
 
     <!-- ==================== HOME SCREEN ==================== -->
@@ -33,7 +36,10 @@
     <string name="hang_up">RACCROCHER</string>
     <string name="speaker">HAUT\nPARLEUR</string>
     <string name="earpiece">À\nL\'OREILLE</string>
-    <string name="taps_remaining">Encore %1$d appuis</string>
+    <plurals name="taps_remaining">
+        <item quantity="one">Encore %1$d appui</item>
+        <item quantity="other">Encore %1$d appuis</item>
+    </plurals>
 
     <!-- ==================== SIM LOCK ==================== -->
     <string name="sim_locked_title">SIM VERROUILLÉE</string>

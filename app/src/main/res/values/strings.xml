@@ -15,7 +15,10 @@
     <string name="understood">Understood</string>
     <string name="unlock">Unlock</string>
     <string name="validate">Validate</string>
-    <string name="press_again">%1$d more tap</string>
+    <plurals name="press_again">
+        <item quantity="one">%1$d more tap</item>
+        <item quantity="other">%1$d more taps</item>
+    </plurals>
     <string name="press_again_to_confirm">Press again to confirm</string>
 
     <!-- ==================== HOME SCREEN ==================== -->
@@ -33,7 +36,10 @@
     <string name="hang_up">HANG UP</string>
     <string name="speaker">SPEAKER</string>
     <string name="earpiece">EARPIECE</string>
-    <string name="taps_remaining">%1$d more tap</string>
+    <plurals name="taps_remaining">
+        <item quantity="one">%1$d more tap</item>
+        <item quantity="other">%1$d more taps</item>
+    </plurals>
 
     <!-- ==================== SIM LOCK ==================== -->
     <string name="sim_locked_title">SIM LOCKED</string>

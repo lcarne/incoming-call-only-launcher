@@ -200,8 +200,9 @@ fun CallLayout(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     if (tapsRemaining < 2) {
                         Text(
-                            text = stringResource(
-                                id = R.string.taps_remaining,
+                            text = androidx.compose.ui.res.pluralStringResource(
+                                id = R.plurals.taps_remaining,
+                                count = tapsRemaining,
                                 tapsRemaining
                             ),
                             color = Color.White,
@@ -269,8 +270,9 @@ fun CallLayout(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (tapsRemaining < 2) {
                     Text(
-                        text = stringResource(
-                            id = R.string.press_again,
+                        text = androidx.compose.ui.res.pluralStringResource(
+                            id = R.plurals.press_again,
+                            count = tapsRemaining,
                             tapsRemaining
                         ),
                         color = Color.White,
