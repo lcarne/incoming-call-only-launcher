@@ -182,23 +182,42 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    private var currentRingtone: android.media.Ringtone? = null
+    private var ringtoneJob: kotlinx.coroutines.Job? = null
+
     fun testRingtone() {
-        viewModelScope.launch {
+        // Stop existing ringtone and cancel the stop timer
+        ringtoneJob?.cancel()
+        if (currentRingtone?.isPlaying == true) {
+            currentRingtone?.stop()
+        }
+
+        ringtoneJob = viewModelScope.launch {
             try {
                 val uri = android.media.RingtoneManager.getActualDefaultRingtoneUri(
                     context,
                     android.media.RingtoneManager.TYPE_RINGTONE
                 )
-                val ringtone = android.media.RingtoneManager.getRingtone(context, uri)
-                ringtone.play()
+
+
+                currentRingtone = android.media.RingtoneManager.getRingtone(context, uri)
+                currentRingtone?.play()
+
                 // Stop after 3 seconds
                 kotlinx.coroutines.delay(3000)
-                if (ringtone.isPlaying) {
-                    ringtone.stop()
+                if (currentRingtone?.isPlaying == true) {
+                    currentRingtone?.stop()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (currentRingtone?.isPlaying == true) {
+            currentRingtone?.stop()
         }
     }
 
