@@ -1,8 +1,10 @@
 package com.incomingcallonly.launcher.manager
 
+import android.content.Context
 import android.telecom.Call
 import android.telecom.CallAudioState
 import android.telephony.PhoneNumberUtils
+import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.data.model.CallLog
 import com.incomingcallonly.launcher.data.model.CallLogType
 import com.incomingcallonly.launcher.data.repository.CallLogRepository
@@ -16,9 +18,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Singleton
 class CallManager @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val callLogRepository: CallLogRepository,
     private val contactRepository: ContactRepository,
     private val settingsRepository: SettingsRepository
@@ -102,7 +106,7 @@ class CallManager @Inject constructor(
                 // Silently reject if not a contact
                 call.reject(false, null)
                 // Log it as BLOCKED if screening didn't already
-                logCallInternal(number ?: "Inconnu", null, CallLogType.BLOCKED)
+                logCallInternal(number ?: context.getString(R.string.unknown_number), null, CallLogType.BLOCKED)
                 currentCall = null
             }
         }

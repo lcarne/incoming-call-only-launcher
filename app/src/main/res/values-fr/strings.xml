@@ -31,6 +31,7 @@
 
     <!-- ==================== INCOMING CALL ==================== -->
     <string name="incoming_call">Appel entrant</string>
+    <string name="unknown_number">Inconnu</string>
     <string name="answer">RÉPONDRE</string>
     <string name="refuse">REFUSER</string>
     <string name="hang_up">RACCROCHER</string>
