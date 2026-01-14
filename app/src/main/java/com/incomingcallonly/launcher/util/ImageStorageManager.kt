@@ -26,9 +26,27 @@ class ImageStorageManager @Inject constructor(
             val destFile = File(photosDir, fileName)
 
             context.contentResolver.openInputStream(uri)?.use { input ->
+                val originalBitmap = android.graphics.BitmapFactory.decodeStream(input)
+                
+                // Resize logic
+                val maxDimension = 512
+                val ratio = Math.min(
+                    maxDimension.toFloat() / originalBitmap.width,
+                    maxDimension.toFloat() / originalBitmap.height
+                )
+                val width = (originalBitmap.width * ratio).toInt()
+                val height = (originalBitmap.height * ratio).toInt()
+                
+                val resizedBitmap = android.graphics.Bitmap.createScaledBitmap(originalBitmap, width, height, true)
+
                 FileOutputStream(destFile).use { output ->
-                    input.copyTo(output)
+                     resizedBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, output)
                 }
+                
+                if (originalBitmap != resizedBitmap) {
+                    originalBitmap.recycle()
+                }
+                resizedBitmap.recycle()
             }
             Uri.fromFile(destFile).toString()
         } catch (e: Exception) {
