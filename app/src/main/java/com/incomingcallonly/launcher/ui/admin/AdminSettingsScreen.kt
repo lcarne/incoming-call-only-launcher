@@ -240,11 +240,22 @@ fun AdminSettingsScreen(
             // Support Section
             SectionHeader(text = stringResource(id = R.string.support))
 
+            SettingsCard {
             ListItem(
                 headlineContent = { Text(stringResource(id = R.string.buy_me_coffee)) },
-                leadingContent = { Icon(Icons.Default.Favorite, contentDescription = null, tint = androidx.compose.ui.graphics.Color(0xFFFFDD00)) }, // BMC Yellow/Gold or just rely on text
-                modifier = Modifier.clickable { uriHandler.openUri("https://buymeacoffee.com/leocarne") }
+                    leadingContent = { 
+                        PremiumIcon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = null,
+                            tint = androidx.compose.ui.graphics.Color(0xFFFFDD00)
+                        ) 
+                    },
+                    modifier = Modifier.clickable {
+                        onUnpin()
+                        uriHandler.openUri("https://buymeacoffee.com/leocarne") 
+                    }
             )
+            }
             
             Spacer(modifier = Modifier.height(Spacing.xxxl))
         }
