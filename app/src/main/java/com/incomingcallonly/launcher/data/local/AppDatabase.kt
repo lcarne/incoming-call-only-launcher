@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.incomingcallonly.launcher.data.model.CallLog
 import com.incomingcallonly.launcher.data.model.Contact
 
-@Database(entities = [Contact::class, CallLog::class], version = 2, exportSchema = true)
+@Database(entities = [Contact::class, CallLog::class], version = 3, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun contactDao(): ContactDao

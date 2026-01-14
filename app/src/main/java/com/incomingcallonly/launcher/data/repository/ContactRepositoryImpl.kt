@@ -42,8 +42,7 @@ class ContactRepositoryImpl @Inject constructor(
             com.incomingcallonly.launcher.data.model.ContactExportDto(
                 name = contact.name,
                 phoneNumber = contact.phoneNumber,
-                photoBase64 = photoBase64,
-                isFavorite = contact.isFavorite
+                photoBase64 = photoBase64
             )
         }
         return com.google.gson.Gson().toJson(exportList)
@@ -76,8 +75,7 @@ class ContactRepositoryImpl @Inject constructor(
                 val newContact = Contact(
                     name = dto.name,
                     phoneNumber = dto.phoneNumber,
-                    photoUri = photoUri,
-                    isFavorite = dto.isFavorite
+                    photoUri = photoUri
                 )
                 contactDao.insertContact(newContact)
                 count++

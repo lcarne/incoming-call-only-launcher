@@ -9,6 +9,5 @@ data class Contact(
     val id: Int = 0,
     val name: String,
     val phoneNumber: String,
-    val photoUri: String? = null, // Path to local storage or content URI
-    val isFavorite: Boolean = true // Default to true as app purpose is favorites
+    val photoUri: String? = null // Path to local storage or content URI
 )
