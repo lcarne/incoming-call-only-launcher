@@ -132,6 +132,8 @@
     <string name="import_contacts">Import Contacts</string>
     <string name="export_contacts">Export Contacts</string>
     <string name="import_from_directory">Import from directory</string>
+    <string name="discard_changes_title">Discard changes?</string>
+    <string name="discard_changes_message">Do you want to discard unsaved changes?</string>
 
     <!-- ==================== ADMIN: CALL HISTORY ==================== -->
     <string name="call_history">Call history</string>

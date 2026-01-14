@@ -171,8 +171,56 @@ fun ContactDialog(
         }
     )
 
+    var showDiscardConfirmation by remember { mutableStateOf(false) }
+    
+    // Check if form is modified
+    fun isModified(): Boolean {
+        if (contactToEdit == null) {
+            return firstName.isNotBlank() || lastName.isNotBlank() || number.isNotBlank() || photoUri != null
+        }
+        val names = contactToEdit.name.split(" ")
+        val originalFirst = names.firstOrNull() ?: ""
+        val originalLast = if (names.size > 1) names.drop(1).joinToString(" ") else ""
+        val originalPhone = contactToEdit.phoneNumber
+        val originalPhoto = contactToEdit.photoUri
+        val currentPhoto = photoUri?.toString()
+        
+        return firstName != originalFirst || lastName != originalLast || number != originalPhone || currentPhoto != originalPhoto
+    }
+    
+    val attemptDismiss = {
+        if (isModified()) {
+            showDiscardConfirmation = true
+        } else {
+            onDismiss()
+        }
+    }
+
+    if (showDiscardConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDiscardConfirmation = false },
+            title = { Text(stringResource(R.string.discard_changes_title)) },
+            text = { Text(stringResource(R.string.discard_changes_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDiscardConfirmation = false
+                        onDismiss()
+                    }
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscardConfirmation = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = attemptDismiss,
         title = {
             Text(
                 text = if (contactToEdit == null) stringResource(id = R.string.new_contact) else stringResource(
@@ -389,7 +437,7 @@ fun ContactDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = attemptDismiss) {
                 Text(stringResource(id = R.string.cancel))
             }
         }
