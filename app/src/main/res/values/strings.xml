@@ -79,6 +79,10 @@
     <string name="reset_settings">Reset settings</string>
     <string name="confirm_reset_settings">Are you sure you want to reset all settings to default?</string>
 
+    <!-- Support -->
+    <string name="support">Support</string>
+    <string name="buy_me_coffee">Buy me a coffee</string>
+
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
     <string name="screen_behavior_battery">On Battery</string>

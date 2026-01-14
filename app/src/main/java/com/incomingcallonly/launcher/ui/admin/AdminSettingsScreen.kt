@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
@@ -44,6 +45,7 @@ fun AdminSettingsScreen(
     onShowHistory: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     var showResetDataDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
     var showResetSettingsDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
 
@@ -236,6 +238,22 @@ fun AdminSettingsScreen(
                 headlineContent = { Text(stringResource(id = R.string.reset_settings)) },
                 leadingContent = { Icon(Icons.Default.Refresh, contentDescription = null) },
                 modifier = Modifier.clickable { showResetSettingsDialog = true }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            // Support Section
+            Text(
+                text = stringResource(id = R.string.support),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(id = R.string.buy_me_coffee)) },
+                leadingContent = { Icon(Icons.Default.Favorite, contentDescription = null, tint = androidx.compose.ui.graphics.Color(0xFFFFDD00)) }, // BMC Yellow/Gold or just rely on text
+                modifier = Modifier.clickable { uriHandler.openUri("https://buymeacoffee.com/leocarne") }
             )
             
             Spacer(modifier = Modifier.height(32.dp))

@@ -79,6 +79,10 @@
     <string name="reset_settings">Réinitialiser les réglages</string>
     <string name="confirm_reset_settings">Êtes-vous sûr de vouloir réinitialiser tous les réglages par défaut ?</string>
 
+    <!-- Support-->
+    <string name="support">Soutien</string>
+    <string name="buy_me_coffee">M'offrir un café</string>
+
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
     <string name="screen_behavior_battery">Batterie</string>
