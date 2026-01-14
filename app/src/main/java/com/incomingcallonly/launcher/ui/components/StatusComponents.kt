@@ -70,26 +70,14 @@ fun BatteryLevelDisplay(
 
     if (batteryLevel != null) {
         val (level, isCharging) = batteryLevel!!
-        
-        // Determine icon based on level
-        val iconRes = when {
-            isCharging -> R.drawable.ic_battery_charging
-            level <= 20 -> R.drawable.ic_battery_alert
-            level <= 50 -> R.drawable.ic_battery_50
-            level <= 80 -> R.drawable.ic_battery_80
-            else -> R.drawable.ic_battery_full
-        }
-
-        val tint = if (isCharging) White else Color.Unspecified
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
         ) {
-            Icon(
-                painter = androidx.compose.ui.res.painterResource(id = iconRes),
-                contentDescription = stringResource(id = R.string.battery_level_desc),
-                tint = tint,
+            BatteryIcon(
+                level = level,
+                isCharging = isCharging,
                 modifier = Modifier
                     .size(iconSize)
                     .padding(end = 8.dp)
@@ -102,6 +90,102 @@ fun BatteryLevelDisplay(
                 ),
                 color = Color.LightGray
             )
+        }
+    }
+}
+
+@Composable
+fun BatteryIcon(
+    level: Int,
+    isCharging: Boolean,
+    modifier: Modifier = Modifier
+) {
+    // Colors
+    val colorLow = Color(0xFFF44336) // Red
+    val colorMed = Color(0xFFFFEB3B) // Yellow
+    val colorHigh = Color(0xFF4CAF50) // Green
+    val colorCharging = Color.White // White for charging bolt/fill
+    
+    val levelColor = when {
+        level <= 20 -> colorLow
+        level <= 50 -> colorMed
+        else -> colorHigh
+    }
+
+    androidx.compose.foundation.Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+        
+        // Battery Dimensions (Vertical)
+        // Main body: 60% width, 80% height
+        val bodyWidth = width * 0.6f
+        val bodyHeight = height * 0.75f
+        val capWidth = bodyWidth * 0.5f
+        val capHeight = height * 0.08f
+        val bodyLeft = (width - bodyWidth) / 2
+        val totalHeight = bodyHeight + capHeight
+        val startY = (height - totalHeight) / 2
+        val bodyTopFinal = startY + capHeight
+        
+        // Draw Cap
+        drawRect(
+            color = Color.LightGray,
+            topLeft = androidx.compose.ui.geometry.Offset(
+                x = (width - capWidth) / 2,
+                y = startY
+            ),
+            size = androidx.compose.ui.geometry.Size(capWidth, capHeight)
+        )
+        
+        // Draw Body Outline
+        drawRoundRect(
+            color = Color.LightGray,
+            topLeft = androidx.compose.ui.geometry.Offset(bodyLeft, bodyTopFinal),
+            size = androidx.compose.ui.geometry.Size(bodyWidth, bodyHeight),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx(), 4.dp.toPx()),
+            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx())
+        )
+        
+        // Draw Fill Level
+        // Calculate fill height based on level
+        // Padding for outline stroke
+        val strokePadding = 4.dp.toPx() 
+        val fillMaxWidth = bodyWidth - strokePadding * 2
+        val fillMaxHeight = bodyHeight - strokePadding * 2
+        
+        val fillHeight = (fillMaxHeight * (level / 100f)).coerceIn(0f, fillMaxHeight)
+        
+        if (fillHeight > 0) {
+            drawRoundRect(
+                color = if (isCharging) colorCharging else levelColor,
+                topLeft = androidx.compose.ui.geometry.Offset(
+                    x = bodyLeft + strokePadding,
+                    y = bodyTopFinal + strokePadding + (fillMaxHeight - fillHeight)
+                ),
+                size = androidx.compose.ui.geometry.Size(fillMaxWidth, fillHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(2.dp.toPx(), 2.dp.toPx())
+            )
+        }
+        
+        // Draw Bolt if charging
+        if (isCharging) {
+             // A simple bolt shape
+             val boltPath = androidx.compose.ui.graphics.Path().apply {
+                 val cx = width / 2
+                 val cy = bodyTopFinal + bodyHeight / 2
+                 // Simplified bolt coords relative to center
+                 moveTo(cx + bodyWidth * 0.1f, cy - bodyHeight * 0.15f)
+                 lineTo(cx - bodyWidth * 0.2f, cy + bodyHeight * 0.05f)
+                 lineTo(cx - bodyWidth * 0.05f, cy + bodyHeight * 0.05f)
+                 lineTo(cx - bodyWidth * 0.1f, cy + bodyHeight * 0.2f) // Point
+                 lineTo(cx + bodyWidth * 0.2f, cy - bodyHeight * 0.05f)
+                 lineTo(cx + bodyWidth * 0.05f, cy - bodyHeight * 0.05f)
+                 close()
+             }
+             drawPath(
+                 path = boltPath,
+                 color = Color.Black
+             )
         }
     }
 }
