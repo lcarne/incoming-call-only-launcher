@@ -97,16 +97,9 @@ fun IncomingCallOnlyTheme(
         else -> LightColorScheme
     }
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        // SideEffect removed to allow per-screen control
-    }
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AppTypography,  // Use enhanced typography with larger sizes
         content = content
     )
 }
-
-

@@ -19,8 +19,8 @@ import android.app.Activity
  */
 @Composable
 fun SystemBarsColor(
-    statusBarColor: Color = Color.Transparent,
-    navigationBarColor: Color = Color.Transparent,
+    statusBarColor: Color? = null,
+    navigationBarColor: Color? = null,
     darkIcons: Boolean = false
 ) {
     val view = LocalView.current
@@ -28,9 +28,9 @@ fun SystemBarsColor(
         SideEffect {
             val window = view.context.findActivity()?.window ?: return@SideEffect
             @Suppress("DEPRECATION")
-            window.statusBarColor = statusBarColor.toArgb()
+            statusBarColor?.let { window.statusBarColor = it.toArgb() }
             @Suppress("DEPRECATION")
-            window.navigationBarColor = navigationBarColor.toArgb()
+            navigationBarColor?.let { window.navigationBarColor = it.toArgb() }
             
             val windowInsetsController = WindowCompat.getInsetsController(window, view)
             windowInsetsController.isAppearanceLightStatusBars = darkIcons

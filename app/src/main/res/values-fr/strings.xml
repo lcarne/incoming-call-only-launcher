@@ -69,7 +69,6 @@
     <string name="pins_do_not_match">Les codes PIN ne correspondent pas</string>
     <string name="incorrect_previous_pin">Code PIN actuel incorrect</string>
 
-
     <!-- Audio -->
     <string name="default_audio_output">Sortie son par défaut</string>
     <string name="earpiece_setting">À l\'oreille</string>
@@ -80,13 +79,14 @@
     <!-- Data -->
     <string name="data_management">Gestion des données</string>
     <string name="reset_all_data">Supprimer toutes les données</string>
-    <string name="confirm_reset_all_data">Êtes-vous sûr de vouloir supprimer toutes les données (contacts, historique) ? Cette action est irréversible.</string>
+    <string name="confirm_reset_all_data">Êtes-vous sûr de vouloir supprimer toutes les données (contacts, historique) ?\nCette action est irréversible.</string>
     <string name="reset_settings">Réinitialiser les réglages</string>
     <string name="confirm_reset_settings">Êtes-vous sûr de vouloir réinitialiser tous les réglages par défaut ?</string>
 
     <!-- Support-->
     <string name="support">Soutien</string>
     <string name="buy_me_coffee">M\'offrir un café</string>
+    <string name="settings_footer_message">100% gratuit, 100% open source,\nfait avec amour pour ma grand mère</string>
 
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
@@ -144,7 +144,7 @@
     <string name="call_history">Historique des appels</string>
     <string name="no_call_history">Aucun appel dans l\'historique</string>
     <string name="clear_history_title">Supprimer l\'historique</string>
-    <string name="clear_history_confirm">Êtes-vous sûr de vouloir supprimer tout l\'historique des appels ? Cette action est irréversible.</string>
+    <string name="clear_history_confirm">Êtes-vous sûr de vouloir supprimer tout l\'historique des appels ?\nCette action est irréversible.</string>
     <string name="call_received_label">Reçu</string>
     <string name="call_missed_label">Manqué</string>
     <string name="call_rejected_label">Refusé</string>

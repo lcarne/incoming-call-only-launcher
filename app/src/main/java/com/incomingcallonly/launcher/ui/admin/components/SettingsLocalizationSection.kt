@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 
@@ -52,6 +53,7 @@ fun SettingsLocalizationSection(viewModel: AdminViewModel) {
             var showLangDialog by remember { mutableStateOf(false) }
             
             ListItem(
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.language)) },
                 supportingContent = {
                     Text(if (lang == "fr") "Français" else "English")

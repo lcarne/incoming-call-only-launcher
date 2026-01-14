@@ -79,13 +79,14 @@
     <!-- Data -->
     <string name="data_management">Data Management</string>
     <string name="reset_all_data">Delete all data</string>
-    <string name="confirm_reset_all_data">Are you sure you want to delete all data (contacts, call history)? This action is irreversible.</string>
+    <string name="confirm_reset_all_data">Are you sure you want to delete all data (contacts, call history)?\nThis action is irreversible.</string>
     <string name="reset_settings">Reset settings</string>
-    <string name="confirm_reset_settings">Are you sure you want to reset all settings to default?</string>
+    <string name="confirm_reset_settings">Are you sure you want to reset all settings to default?\nThis action is irreversible.</string>
 
     <!-- Support -->
     <string name="support">Support</string>
     <string name="buy_me_coffee">Buy me a coffee</string>
+    <string name="settings_footer_message">100% free, 100% open source,\nmade with love for my grandmother</string>
 
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
@@ -150,8 +151,6 @@
     <string name="call_rejected_auto_label">Rejected (auto)</string>
 
     <!-- ==================== ONBOARDING ==================== -->
-
-
     <string name="onboarding_important">Important: This message will not be shown again.</string>
 
     <!-- Slides -->

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
@@ -23,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -72,10 +74,11 @@ fun AdminSettingsScreen(
     var showResetSettingsDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
 
     // System Bars Configuration
+    val isDarkTheme = isSystemInDarkTheme()
     SystemBarsColor(
-        statusBarColor = Color.White,
-        navigationBarColor = Color.White,
-        darkIcons = true // Dark icons on light background
+        statusBarColor = Color.Transparent,
+        navigationBarColor = Color.Transparent,
+        darkIcons = !isDarkTheme
     )
 
     // Modern Dialogs
@@ -158,7 +161,7 @@ fun AdminSettingsScreen(
     )
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { 
@@ -168,8 +171,8 @@ fun AdminSettingsScreen(
                     ) 
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
                 )
             )
         }
@@ -183,6 +186,7 @@ fun AdminSettingsScreen(
             // Quick Actions - Now more prominent
             AdminSettingsCard {
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { 
                         Text(
                             stringResource(id = R.string.unlock),
@@ -206,6 +210,7 @@ fun AdminSettingsScreen(
                 )
                 AdminDivider()
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { 
                         Text(
                             stringResource(id = R.string.back_arrow),
@@ -283,6 +288,7 @@ fun AdminSettingsScreen(
 
             AdminSettingsCard {
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { Text(stringResource(id = R.string.export_contacts)) },
                     leadingContent = { 
                         AdminIcon(
@@ -297,6 +303,7 @@ fun AdminSettingsScreen(
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { Text(stringResource(id = R.string.import_contacts)) },
                     leadingContent = { 
                         AdminIcon(
@@ -314,6 +321,7 @@ fun AdminSettingsScreen(
             // Dangerous Zone - Same style as export/import section
             AdminSettingsCard {
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { Text(stringResource(id = R.string.reset_settings)) },
                     leadingContent = { 
                         AdminIcon(
@@ -329,6 +337,7 @@ fun AdminSettingsScreen(
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { 
                         Text(
                             stringResource(id = R.string.reset_all_data),
@@ -353,6 +362,7 @@ fun AdminSettingsScreen(
 
             AdminSettingsCard {
                 ListItem(
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     headlineContent = { Text(stringResource(id = R.string.buy_me_coffee)) },
                     leadingContent = { 
                         AdminIcon(
@@ -377,6 +387,18 @@ fun AdminSettingsScreen(
                 )
             }
             
+            Spacer(modifier = Modifier.height(Spacing.xl))
+
+            Text(
+                text = stringResource(id = R.string.settings_footer_message),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.xl),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                textAlign = TextAlign.Center
+            )
+
             Spacer(modifier = Modifier.height(Spacing.xxxl))
         }
     }

@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Enable modern edge-to-edge display (Android 15+)
-        enableEdgeToEdge()
+        // enableEdgeToEdge() removed to keep status bar black and separate
 
         ringerManager.startObserving(lifecycleScope)
 
@@ -62,11 +63,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             IncomingCallOnlyTheme {
-                // Default System Bars Color (can be overridden by screens)
+                // Default System Bars Color: Set Status Bar to Black for Home/Lock screens
+                // Admin/Settings screens will override this to White
                 SystemBarsColor(
-                    statusBarColor = MaterialTheme.colorScheme.background,
-                    navigationBarColor = MaterialTheme.colorScheme.background,
-                    darkIcons = !isSystemInDarkTheme()
+                    statusBarColor = androidx.compose.ui.graphics.Color.Black,
+                    darkIcons = false
                 )
 
                 Box(modifier = Modifier.fillMaxSize()) {

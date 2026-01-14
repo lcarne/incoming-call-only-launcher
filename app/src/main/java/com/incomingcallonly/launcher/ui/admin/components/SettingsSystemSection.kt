@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.ui.admin.AdminViewModel
+import androidx.compose.material3.ListItemDefaults
 
 @Composable
 fun SettingsSystemSection(viewModel: AdminViewModel) {
@@ -31,6 +32,7 @@ fun SettingsSystemSection(viewModel: AdminViewModel) {
             // Call Security
             val allowAllCalls by viewModel.allowAllCalls.collectAsState()
             ListItem(
+                colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.accept_all_calls)) },
                 supportingContent = { Text(stringResource(id = R.string.accept_all_calls_desc)) },
                 trailingContent = {
@@ -47,6 +49,7 @@ fun SettingsSystemSection(viewModel: AdminViewModel) {
             var showChangePinDialog by remember { mutableStateOf(false) }
             
             ListItem(
+                colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.change_pin)) },
                 supportingContent = { Text(stringResource(id = R.string.change_pin_desc)) },
                 modifier = Modifier.clickable { showChangePinDialog = true }

@@ -181,7 +181,7 @@ fun AdminSelectionItem(
 @Composable
 fun AdminSettingsCard(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else Color.White,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
@@ -230,7 +230,7 @@ fun AdminNavigationItem(
                 ambientColor = Color.Black.copy(alpha = 0.15f)
             ),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(
             width = 1.dp,

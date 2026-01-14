@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,6 +70,7 @@ fun SettingsDisplaySection(viewModel: AdminViewModel) {
         AdminSettingsCard {
             // Plugged Behavior
             ListItem(
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.screen_behavior_plugged)) },
                 leadingContent = {
                     Icon(
@@ -93,6 +95,7 @@ fun SettingsDisplaySection(viewModel: AdminViewModel) {
 
             // Battery Behavior
             ListItem(
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.screen_behavior_battery)) },
                 leadingContent = {
                     Icon(
@@ -117,6 +120,7 @@ fun SettingsDisplaySection(viewModel: AdminViewModel) {
         // Night Mode Group
         AdminSettingsCard {
             ListItem(
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.night_mode)) },
                 supportingContent = { Text(stringResource(id = R.string.night_mode_desc)) },
                 trailingContent = {
@@ -182,6 +186,7 @@ fun NightModeSettings(viewModel: AdminViewModel) {
 
     Column {
         ListItem(
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             headlineContent = { Text(stringResource(id = R.string.night_start_label)) },
             trailingContent = {
                 Text(
@@ -197,6 +202,7 @@ fun NightModeSettings(viewModel: AdminViewModel) {
         AdminDivider() // Divider between start and end
         
         ListItem(
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             headlineContent = { Text(stringResource(id = R.string.night_end_label)) },
             trailingContent = {
                 Text(
@@ -301,6 +307,7 @@ fun ClockColorSelector(viewModel: AdminViewModel) {
     val currentColor = if (storedColorValue != 0) Color(storedColorValue) else MaterialTheme.colorScheme.primary
 
     ListItem(
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         headlineContent = { Text(stringResource(id = R.string.clock_color)) },
         supportingContent = {
             FlowRow(

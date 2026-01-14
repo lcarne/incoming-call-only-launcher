@@ -24,8 +24,11 @@ import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.incomingcallonly.launcher.ui.theme.SystemBarsColor
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,14 +57,23 @@ fun PinEntryScreen(
     var pin by remember { mutableStateOf("") }
     val isError by viewModel.pinError.collectAsState()
 
-    Surface(
+    val isDarkTheme = isSystemInDarkTheme()
+    
+    // System Bars Configuration
+    SystemBarsColor(
+        statusBarColor = Color.Transparent,
+        navigationBarColor = Color.Transparent,
+        darkIcons = !isDarkTheme
+    )
+
+    Scaffold(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
+                .padding(paddingValues)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -219,7 +231,8 @@ fun PinEntryScreen(
                 )
             }
         }
-    }
+        }
+
 
     LaunchedEffect(isError) {
         if (isError) {
