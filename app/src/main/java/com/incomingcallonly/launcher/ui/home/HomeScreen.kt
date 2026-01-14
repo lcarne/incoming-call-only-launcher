@@ -45,10 +45,23 @@ import com.incomingcallonly.launcher.ui.onboarding.OnboardingFlow
 import com.incomingcallonly.launcher.ui.theme.Black
 import com.incomingcallonly.launcher.ui.theme.HighContrastButtonBg
 import com.incomingcallonly.launcher.ui.theme.White
+import com.incomingcallonly.launcher.ui.theme.DimmedClockColor
+import android.view.WindowManager.LayoutParams
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private const val CLOCK_DATE_FORMAT = "EEEE d MMMM yyyy"
+private const val ADMIN_TAP_THRESHOLD = 15
+private const val ADMIN_TAP_TIMEOUT_MS = 1000L
+private const val BRIGHTNESS_DIM = 0.01f
+private const val INACTIVITY_TIMEOUT_MS = 300L // Note: Code logic uses 300ms currently
+
+// Behavior States
+private const val BEHAVIOR_OFF = 0
+private const val BEHAVIOR_DIM = 1
+private const val BEHAVIOR_AWAKE = 2
+private const val MINUTES_IN_HOUR = 60
 
 @Composable
 fun HomeScreen(
@@ -79,10 +92,10 @@ fun HomeScreen(
     val calendar = java.util.Calendar.getInstance()
     calendar.time = currentTime
     val currentTotalMinutes =
-        calendar.get(java.util.Calendar.HOUR_OF_DAY) * 60 + calendar.get(java.util.Calendar.MINUTE)
+        calendar.get(java.util.Calendar.HOUR_OF_DAY) * MINUTES_IN_HOUR + calendar.get(java.util.Calendar.MINUTE)
 
-    val startTotalMinutes = nightStart * 60 + nightStartMin
-    val endTotalMinutes = nightEnd * 60 + nightEndMin
+    val startTotalMinutes = nightStart * MINUTES_IN_HOUR + nightStartMin
+    val endTotalMinutes = nightEnd * MINUTES_IN_HOUR + nightEndMin
 
     val isNightInSchedule = if (startTotalMinutes < endTotalMinutes) {
         currentTotalMinutes in startTotalMinutes until endTotalMinutes
@@ -135,9 +148,9 @@ fun HomeScreen(
     // Inactivity Monitor
     LaunchedEffect(currentTime, currentBehavior, isNight) {
         // Only monitor for dimming if we are in DIM mode (1) and not in Night Mode
-        if (currentBehavior == 1 && !isNight) {
+        if (currentBehavior == BEHAVIOR_DIM && !isNight) {
             val timeSinceLastInteraction = System.currentTimeMillis() - lastInteractionTime
-            if (timeSinceLastInteraction > 300) { // 1 minute
+            if (timeSinceLastInteraction > INACTIVITY_TIMEOUT_MS) { 
                 isDimmed = true
             }
         } else {
@@ -160,42 +173,42 @@ fun HomeScreen(
         if (activity != null) {
             val isTransitioningFromNightToDay = previousIsNight && !isNight
 
-            activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            activity.window.clearFlags(LayoutParams.FLAG_KEEP_SCREEN_ON)
 
             val params = activity.window.attributes
 
             if (!isNight) {
-                if (isTransitioningFromNightToDay && currentBehavior != 0) {
+                if (isTransitioningFromNightToDay && currentBehavior != BEHAVIOR_OFF) {
                     viewModel.wakeUpScreen()
                 }
 
                 when (currentBehavior) {
-                    0 -> { // OFF
+                    BEHAVIOR_OFF -> { // OFF
                         // Standard Android timeout behavior
                         params.screenBrightness =
-                            android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                            LayoutParams.BRIGHTNESS_OVERRIDE_NONE
                     }
 
-                    1 -> { // DIM
+                    BEHAVIOR_DIM -> { // DIM
                         // Keep screen on
-                        activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        activity.window.addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON)
                         if (isDimmed) {
-                            params.screenBrightness = 0.01f // Lowest brightness
+                            params.screenBrightness = BRIGHTNESS_DIM // Lowest brightness
                         } else {
                             params.screenBrightness =
-                                android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                                LayoutParams.BRIGHTNESS_OVERRIDE_NONE
                         }
                     }
 
-                    2 -> { // AWAKE
-                        activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    BEHAVIOR_AWAKE -> { // AWAKE
+                        activity.window.addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON)
                         params.screenBrightness =
-                            android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                            LayoutParams.BRIGHTNESS_OVERRIDE_NONE
                     }
                 }
             } else {
                 params.screenBrightness =
-                    android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                    LayoutParams.BRIGHTNESS_OVERRIDE_NONE
             }
             activity.window.attributes = params
 
@@ -244,7 +257,7 @@ fun HomeScreen(
         }
     }
 
-    val dateFormat = SimpleDateFormat("EEEE d MMMM yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(CLOCK_DATE_FORMAT, Locale.getDefault())
 
     Box(
         modifier = Modifier
@@ -307,14 +320,14 @@ fun HomeScreen(
                         detectTapGestures(
                             onTap = {
                                 val now = System.currentTimeMillis()
-                                if (now - lastTapTime < 1000) {
+                                if (now - lastTapTime < ADMIN_TAP_TIMEOUT_MS) {
                                     adminTapCount++
                                 } else {
                                     adminTapCount = 1
                                 }
                                 lastTapTime = now
 
-                                if (adminTapCount >= 15) {
+                                if (adminTapCount >= ADMIN_TAP_THRESHOLD) {
                                     adminTapCount = 0
                                     onAdminClick()
                                 }
@@ -387,7 +400,7 @@ fun HomeScreen(
                 ClockDisplay(
                     currentTime = currentTime,
                     timeFormat = savedFormat,
-                    clockColor = Color(0xFFB4BEB0)
+                    clockColor = DimmedClockColor
                 )
             }
         }

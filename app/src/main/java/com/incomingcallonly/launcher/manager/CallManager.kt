@@ -3,6 +3,7 @@ package com.incomingcallonly.launcher.manager
 import android.content.Context
 import android.telecom.Call
 import android.telecom.CallAudioState
+import android.telecom.VideoProfile
 import android.telephony.PhoneNumberUtils
 import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.data.model.CallLog
@@ -27,6 +28,10 @@ class CallManager @Inject constructor(
     private val contactRepository: ContactRepository,
     private val settingsRepository: SettingsRepository
 ) {
+
+    private companion object {
+        const val MILLISECONDS_PER_SECOND = 1000L
+    }
 
     private var currentCall: Call? = null
     private var answerTime: Long = 0
@@ -143,7 +148,7 @@ class CallManager @Inject constructor(
 
             Call.STATE_DISCONNECTED -> {
                 if (wasAnswered && answerTime > 0) {
-                    durationSeconds = (System.currentTimeMillis() - answerTime) / 1000
+                    durationSeconds = (System.currentTimeMillis() - answerTime) / MILLISECONDS_PER_SECOND
                 }
                 _callState.value = CallState.Ended
                 logCall()
@@ -157,7 +162,7 @@ class CallManager @Inject constructor(
     }
 
     fun accept() {
-        currentCall?.answer(0)
+        currentCall?.answer(VideoProfile.STATE_AUDIO_ONLY)
     }
 
     fun reject() {

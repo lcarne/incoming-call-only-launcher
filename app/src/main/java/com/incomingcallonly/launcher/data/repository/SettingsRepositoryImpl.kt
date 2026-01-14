@@ -25,14 +25,14 @@ class SettingsRepositoryImpl @Inject constructor(
     override val screenBehaviorBattery: StateFlow<Int> = _screenBehaviorBattery.asStateFlow()
 
     private val _nightModeStartHour =
-        MutableStateFlow(prefs.getInt(KEY_NIGHT_START, 22)) // Default 22h / 10PM
+        MutableStateFlow(prefs.getInt(KEY_NIGHT_START, DEFAULT_NIGHT_START_HOUR)) // Default 22h / 10PM
     override val nightModeStartHour: StateFlow<Int> = _nightModeStartHour.asStateFlow()
 
     private val _nightModeStartMinute = MutableStateFlow(prefs.getInt(KEY_NIGHT_START_MINUTE, 0))
     override val nightModeStartMinute: StateFlow<Int> = _nightModeStartMinute.asStateFlow()
 
     private val _nightModeEndHour =
-        MutableStateFlow(prefs.getInt(KEY_NIGHT_END, 7)) // Default 7h / 7AM
+        MutableStateFlow(prefs.getInt(KEY_NIGHT_END, DEFAULT_NIGHT_END_HOUR)) // Default 7h / 7AM
     override val nightModeEndHour: StateFlow<Int> = _nightModeEndHour.asStateFlow()
 
     private val _nightModeEndMinute = MutableStateFlow(prefs.getInt(KEY_NIGHT_END_MINUTE, 0))
@@ -54,7 +54,7 @@ class SettingsRepositoryImpl @Inject constructor(
     private val _isRingerEnabled = MutableStateFlow(prefs.getBoolean(KEY_RINGER_ENABLED, true))
     override val isRingerEnabled: StateFlow<Boolean> = _isRingerEnabled.asStateFlow()
 
-    private val _ringerVolume = MutableStateFlow(prefs.getInt(KEY_RINGER_VOLUME, 80)) // 0-100
+    private val _ringerVolume = MutableStateFlow(prefs.getInt(KEY_RINGER_VOLUME, DEFAULT_RINGER_VOLUME)) // 0-100
     override val ringerVolume: StateFlow<Int> = _ringerVolume.asStateFlow()
 
     private val _preNightRingerEnabled = MutableStateFlow(prefs.getBoolean(KEY_PRE_NIGHT_RINGER_ENABLED, true))
@@ -80,7 +80,7 @@ class SettingsRepositoryImpl @Inject constructor(
         MutableStateFlow(prefs.getBoolean(KEY_HAS_SEEN_ONBOARDING, false))
     override val hasSeenOnboarding: StateFlow<Boolean> = _hasSeenOnboarding.asStateFlow()
 
-    private val _adminPin = MutableStateFlow(prefs.getString(KEY_ADMIN_PIN, "1234") ?: "1234")
+    private val _adminPin = MutableStateFlow(prefs.getString(KEY_ADMIN_PIN, DEFAULT_ADMIN_PIN) ?: DEFAULT_ADMIN_PIN)
     override val adminPin: StateFlow<String> = _adminPin.asStateFlow()
 
 
@@ -196,5 +196,11 @@ class SettingsRepositoryImpl @Inject constructor(
         private const val KEY_DEFAULT_SPEAKER_ENABLED = "default_speaker_enabled"
         private const val KEY_HAS_SEEN_ONBOARDING = "has_seen_onboarding"
         private const val KEY_ADMIN_PIN = "admin_pin"
+
+        // Default Values
+        private const val DEFAULT_NIGHT_START_HOUR = 22
+        private const val DEFAULT_NIGHT_END_HOUR = 7
+        private const val DEFAULT_RINGER_VOLUME = 80
+        private const val DEFAULT_ADMIN_PIN = "1234"
     }
 }

@@ -47,6 +47,11 @@ import com.incomingcallonly.launcher.ui.components.BatteryLevelDisplay
 import com.incomingcallonly.launcher.R
 import kotlinx.coroutines.delay
 
+private const val RESET_AMBIGUOUS_TAP_DELAY = 3000L
+private const val TAP_CONFIRMATION_COUNT = 2
+private const val TAP_INFO_ALPHA_BG = 0.8f
+private val EARPIECE_ACTIVE_COLOR = Color(0xFF2196F3)
+
 @Composable
 fun IncomingCallScreen(
     viewModel: IncomingCallViewModel = hiltViewModel(),
@@ -113,12 +118,12 @@ fun CallLayout(
     onCallRejected: (() -> Unit)? = null
 ) {
     val isRinging = state is IncomingCallUiState.Ringing
-    var tapsRemaining by remember { mutableIntStateOf(2) }
+    var tapsRemaining by remember { mutableIntStateOf(TAP_CONFIRMATION_COUNT) }
 
     LaunchedEffect(tapsRemaining) {
-        if (tapsRemaining < 2) {
-            delay(3000)
-            tapsRemaining = 2
+        if (tapsRemaining < TAP_CONFIRMATION_COUNT) {
+            delay(RESET_AMBIGUOUS_TAP_DELAY)
+            tapsRemaining = TAP_CONFIRMATION_COUNT
         }
     }
 
@@ -198,7 +203,7 @@ fun CallLayout(
                 verticalAlignment = Alignment.Bottom
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (tapsRemaining < 2) {
+                    if (tapsRemaining < TAP_CONFIRMATION_COUNT) {
                         Text(
                             text = androidx.compose.ui.res.pluralStringResource(
                                 id = R.plurals.taps_remaining,
@@ -220,7 +225,7 @@ fun CallLayout(
                             if (tapsRemaining <= 0) {
                                 viewModel?.rejectCall()
                                 onCallRejected?.invoke()
-                                tapsRemaining = 2
+                                tapsRemaining = TAP_CONFIRMATION_COUNT
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -268,7 +273,7 @@ fun CallLayout(
             }
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                if (tapsRemaining < 2) {
+                if (tapsRemaining < TAP_CONFIRMATION_COUNT) {
                     Text(
                         text = androidx.compose.ui.res.pluralStringResource(
                             id = R.plurals.press_again,
@@ -279,7 +284,7 @@ fun CallLayout(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .background(Color.Red.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                            .background(Color.Red.copy(alpha = TAP_INFO_ALPHA_BG), RoundedCornerShape(8.dp))
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                     Spacer(Modifier.height(8.dp))
@@ -290,7 +295,7 @@ fun CallLayout(
                         tapsRemaining--
                         if (tapsRemaining <= 0) {
                             viewModel?.endCall()
-                            tapsRemaining = 2
+                            tapsRemaining = TAP_CONFIRMATION_COUNT
                         }
                     },
                     modifier = Modifier.size(140.dp),
@@ -329,7 +334,7 @@ fun CallLayout(
                     Button(
                         onClick = { viewModel?.setSpeakerOn(false) },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (!isSpeakerOn) Color(0xFF2196F3) else Color.DarkGray
+                            containerColor = if (!isSpeakerOn) EARPIECE_ACTIVE_COLOR else Color.DarkGray
                         ),
                         shape = RoundedCornerShape(24.dp),
                         modifier = Modifier.size(110.dp)
@@ -345,7 +350,7 @@ fun CallLayout(
                     Text(
                         text = stringResource(id = R.string.earpiece),
                         style = MaterialTheme.typography.titleLarge,
-                        color = if (!isSpeakerOn) Color(0xFF2196F3) else Color.White,
+                        color = if (!isSpeakerOn) EARPIECE_ACTIVE_COLOR else Color.White,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )

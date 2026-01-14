@@ -40,6 +40,17 @@ import java.util.Locale
 
 import androidx.activity.compose.BackHandler
 
+private const val DATE_FORMAT_HISTORY = "dd/MM HH:mm"
+private const val DURATION_FORMAT_HMS = "%02d:%02d:%02d"
+private const val DURATION_FORMAT_MS = "%02d:%02d"
+private const val SECONDS_PER_HOUR = 3600L
+private const val SECONDS_PER_MINUTE = 60L
+
+private val COLOR_ANSWERED = Color(0xFF4CAF50)
+private val COLOR_MISSED = Color(0xFFF44336)
+private val COLOR_REJECTED = Color(0xFFE91E63)
+private val COLOR_BLOCKED = Color.Gray
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallHistoryScreen(
@@ -130,31 +141,31 @@ fun CallHistoryScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallLogItem(log: CallLog) {
-    val sdf = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
+    val sdf = SimpleDateFormat(DATE_FORMAT_HISTORY, Locale.getDefault())
     val dateStr = sdf.format(Date(log.timestamp))
 
     val (iconRes, color, label) = when (log.type) {
         CallLogType.INCOMING_ANSWERED -> Triple(
             com.incomingcallonly.launcher.R.drawable.ic_call,
-            Color(0xFF4CAF50),
+            COLOR_ANSWERED,
             stringResource(id = com.incomingcallonly.launcher.R.string.call_received_label)
         )
 
         CallLogType.INCOMING_MISSED -> Triple(
             com.incomingcallonly.launcher.R.drawable.ic_call_missed,
-            Color(0xFFF44336),
+            COLOR_MISSED,
             stringResource(id = com.incomingcallonly.launcher.R.string.call_missed_label)
         )
 
         CallLogType.INCOMING_REJECTED -> Triple(
             com.incomingcallonly.launcher.R.drawable.ic_block,
-            Color(0xFFE91E63),
+            COLOR_REJECTED,
             stringResource(id = com.incomingcallonly.launcher.R.string.call_rejected_label)
         )
 
         CallLogType.BLOCKED -> Triple(
             com.incomingcallonly.launcher.R.drawable.ic_block,
-            Color.Gray,
+            COLOR_BLOCKED,
             stringResource(id = com.incomingcallonly.launcher.R.string.call_rejected_auto_label)
         )
     }
@@ -209,12 +220,12 @@ fun CallLogItem(log: CallLog) {
 }
 
 private fun formatDuration(seconds: Long): String {
-    val h = seconds / 3600
-    val m = (seconds % 3600) / 60
-    val s = seconds % 60
+    val h = seconds / SECONDS_PER_HOUR
+    val m = (seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+    val s = seconds % SECONDS_PER_MINUTE
     return if (h > 0) {
-        String.format(Locale.getDefault(), "%02d:%02d:%02d", h, m, s)
+        String.format(Locale.getDefault(), DURATION_FORMAT_HMS, h, m, s)
     } else {
-        String.format(Locale.getDefault(), "%02d:%02d", m, s)
+        String.format(Locale.getDefault(), DURATION_FORMAT_MS, m, s)
     }
 }

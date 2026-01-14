@@ -37,6 +37,20 @@ import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.ui.theme.ErrorRed
 import com.incomingcallonly.launcher.ui.theme.White
 
+private const val BATTERY_LOW_THRESHOLD = 20
+private const val BATTERY_MEDIUM_THRESHOLD = 50
+
+private val COLOR_BATTERY_LOW = Color(0xFFF44336) // Red
+private val COLOR_BATTERY_MEDIUM = Color(0xFFFFEB3B) // Yellow
+private val COLOR_BATTERY_HIGH = Color(0xFF4CAF50) // Green
+
+private val COLOR_BATTERY_CHARGING = Color.White // White for charging bolt/fill
+
+private const val BODY_WIDTH_RATIO = 0.6f
+private const val BODY_HEIGHT_RATIO = 0.75f
+private const val CAP_WIDTH_RATIO_OF_BODY = 0.5f
+private const val CAP_HEIGHT_RATIO = 0.08f
+
 @Composable
 fun BatteryLevelDisplay(
     modifier: Modifier = Modifier,
@@ -100,16 +114,10 @@ fun BatteryIcon(
     isCharging: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Colors
-    val colorLow = Color(0xFFF44336) // Red
-    val colorMed = Color(0xFFFFEB3B) // Yellow
-    val colorHigh = Color(0xFF4CAF50) // Green
-    val colorCharging = Color.White // White for charging bolt/fill
-    
     val levelColor = when {
-        level <= 20 -> colorLow
-        level <= 50 -> colorMed
-        else -> colorHigh
+        level <= BATTERY_LOW_THRESHOLD -> COLOR_BATTERY_LOW
+        level <= BATTERY_MEDIUM_THRESHOLD -> COLOR_BATTERY_MEDIUM
+        else -> COLOR_BATTERY_HIGH
     }
 
     androidx.compose.foundation.Canvas(modifier = modifier) {
@@ -117,11 +125,10 @@ fun BatteryIcon(
         val height = size.height
         
         // Battery Dimensions (Vertical)
-        // Main body: 60% width, 80% height
-        val bodyWidth = width * 0.6f
-        val bodyHeight = height * 0.75f
-        val capWidth = bodyWidth * 0.5f
-        val capHeight = height * 0.08f
+        val bodyWidth = width * BODY_WIDTH_RATIO
+        val bodyHeight = height * BODY_HEIGHT_RATIO
+        val capWidth = bodyWidth * CAP_WIDTH_RATIO_OF_BODY
+        val capHeight = height * CAP_HEIGHT_RATIO
         val bodyLeft = (width - bodyWidth) / 2
         val totalHeight = bodyHeight + capHeight
         val startY = (height - totalHeight) / 2
@@ -157,7 +164,7 @@ fun BatteryIcon(
         
         if (fillHeight > 0) {
             drawRoundRect(
-                color = if (isCharging) colorCharging else levelColor,
+                color = if (isCharging) COLOR_BATTERY_CHARGING else levelColor,
                 topLeft = androidx.compose.ui.geometry.Offset(
                     x = bodyLeft + strokePadding,
                     y = bodyTopFinal + strokePadding + (fillMaxHeight - fillHeight)

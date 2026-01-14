@@ -77,3 +77,4 @@ val ConfirmGreen = Color(0xFF4CAF50)
 val HighContrastButtonBg = PrimaryBlue
 val DarkGray = Color(0xFF333333)
 val Red = ErrorRed
+val DimmedClockColor = Color(0xFFB4BEB0)
