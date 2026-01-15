@@ -1,5 +1,8 @@
 # Incoming Call Only Launcher – Minimalist & Secure Android Launcher
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
+[![fr](https://img.shields.io/badge/lang-fr-blue.svg)](README.fr.md)
+
 <p>
   <img src="images/app_icon.svg" alt="App icon" width="160"/>
 </p>
