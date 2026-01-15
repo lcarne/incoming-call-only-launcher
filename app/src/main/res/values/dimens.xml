@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="max_content_width">400dp</dimen>
+    <dimen name="contact_item_height">72dp</dimen>
+    <dimen name="button_min_height">56dp</dimen>
+</resources>
