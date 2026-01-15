@@ -39,8 +39,13 @@ class ContactRepositoryImpl @Inject constructor(
                     null
                 }
             }
+            val names = contact.name.split(" ")
+            val firstName = if (names.isNotEmpty()) names.first() else ""
+            val lastName = if (names.size > 1) names.drop(1).joinToString(" ") else ""
+
             com.incomingcallonly.launcher.data.model.ContactExportDto(
-                name = contact.name,
+                firstName = firstName,
+                lastName = lastName,
                 phoneNumber = contact.phoneNumber,
                 photoBase64 = photoBase64
             )
@@ -72,8 +77,9 @@ class ContactRepositoryImpl @Inject constructor(
                     }
                 }
 
+                val fullName = if (dto.lastName.isNotBlank()) "${dto.firstName} ${dto.lastName}" else dto.firstName
                 val newContact = Contact(
-                    name = dto.name,
+                    name = fullName,
                     phoneNumber = dto.phoneNumber,
                     photoUri = photoUri
                 )

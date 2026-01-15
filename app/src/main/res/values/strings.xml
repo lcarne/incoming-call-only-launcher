@@ -86,7 +86,7 @@
     <!-- Support -->
     <string name="support">Support</string>
     <string name="buy_me_coffee">Buy me a coffee</string>
-    <string name="settings_footer_message" formatted="false">100% free, 100% open source,\nmade with ❤️ for my grandmother</string>
+    <string name="settings_footer_message">100% free, 100% open source,\nmade with ❤️ for my grandmother</string>
 
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
