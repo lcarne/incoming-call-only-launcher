@@ -29,6 +29,18 @@ import androidx.compose.ui.unit.dp
 import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.ui.components.DepthIcon
 import com.incomingcallonly.launcher.ui.theme.HighContrastButtonBg
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Row
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.incomingcallonly.launcher.ui.theme.ConfirmGreen
+import com.incomingcallonly.launcher.ui.theme.ErrorRed
+import com.incomingcallonly.launcher.ui.onboarding.parseBoldString
 
 @Composable
 fun DefaultAppPrompts(
@@ -38,6 +50,7 @@ fun DefaultAppPrompts(
     onPinClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    var showLauncherModal by remember { mutableStateOf(false) }
 
     // Launcher for dialer role request
     val dialerLauncher = rememberLauncherForActivityResult(
@@ -101,8 +114,8 @@ fun DefaultAppPrompts(
         }
 
         if (!isDefaultLauncher) {
-            androidx.compose.material3.Button(
-                onClick = { requestDefaultLauncher() },
+            Button(
+                onClick = { showLauncherModal = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                     containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
@@ -144,6 +157,53 @@ fun DefaultAppPrompts(
                 )
             }
         }
+    }
+
+    if (showLauncherModal) {
+        AlertDialog(
+            onDismissRequest = { showLauncherModal = false },
+            title = {
+                Text(
+                    text = stringResource(id = R.string.onboarding_default_launcher_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Text(
+                    text = parseBoldString(stringResource(id = R.string.onboarding_default_launcher_message)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Start
+                )
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = { showLauncherModal = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(stringResource(id = R.string.cancel))
+                    }
+                    Button(
+                        onClick = {
+                            showLauncherModal = false
+                            requestDefaultLauncher()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = ConfirmGreen),
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        Text(stringResource(id = R.string.validate))
+                    }
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

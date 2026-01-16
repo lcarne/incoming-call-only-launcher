@@ -52,8 +52,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
     // 4: Location Explanation
     // 5: Request Location
     // 6: Default Dialer
-    // 7: Default Launcher
-    // 8: Admin Explanation
+    // 7: Admin Explanation
 
     val contactLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -81,11 +80,10 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
             androidx.compose.material3.Icon(
                 imageVector = when (step) {
                     0 -> Icons.Default.Info
-                    1, 8 -> Icons.Default.Lock
+                    1, 7 -> Icons.Default.Lock
                     2 -> Icons.Default.Person
                     3, 6 -> Icons.Default.Phone
                     4, 5 -> Icons.Default.LocationOn
-                    7 -> Icons.Default.Home // Need Home icon import
                     else -> Icons.Default.Info
                 },
                 contentDescription = null
@@ -101,7 +99,6 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                     4 -> R.string.onboarding_auth_location_intro_title
                     5 -> R.string.onboarding_auth_location_request_title
                     6 -> R.string.onboarding_default_dialer_title
-                    7 -> R.string.onboarding_default_launcher_title
                     else -> R.string.onboarding_admin_intro_title
                 }),
                 style = MaterialTheme.typography.headlineSmall,
@@ -119,7 +116,6 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         4 -> R.string.onboarding_auth_location_intro_message
                         5 -> R.string.onboarding_auth_location_request_message
                         6 -> R.string.onboarding_default_dialer_message
-                        7 -> R.string.onboarding_default_launcher_message
                         else -> R.string.onboarding_admin_intro_message
                     })),
                     style = MaterialTheme.typography.bodyMedium,
@@ -127,7 +123,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (step == 8) {
+                if (step == 7) {
                     Text(
                         text = stringResource(id = R.string.onboarding_important),
                         style = MaterialTheme.typography.titleMedium,
@@ -139,7 +135,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            if (step == 8) {
+            if (step == 7) {
                 // Admin Step Logic (Double Tap)
                 var tapCount by remember { mutableStateOf(0) }
 
@@ -217,16 +213,6 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                                     }
                                 }
                             }
-                            7 -> {
-                                // Request Default Launcher
-                                // For launcher, we can't easily check if we are default *before* launching intent inside a generic function without more context/logic,
-                                // but we can just launch the settings.
-                                // Unlike dialer, there is no result callback that guarantees we are set.
-                                // We'll just launch it and move next.
-                                val intent = android.content.Intent(android.provider.Settings.ACTION_HOME_SETTINGS)
-                                context.startActivity(intent)
-                                step++
-                            }
                         }
                     },
                     modifier = Modifier
@@ -234,7 +220,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         .heightIn(min = 56.dp)
                 ) {
                     Text(
-                        text = stringResource(id = if (step in listOf(2, 3, 5, 6, 7)) R.string.validate else R.string.next),
+                        text = stringResource(id = if (step in listOf(2, 3, 5, 6)) R.string.validate else R.string.next),
                         fontSize = 18.sp
                     )
                 }
