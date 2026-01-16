@@ -25,7 +25,8 @@
     <string name="ringer_active">SONNERIE ACTIVE</string>
     <string name="ringer_disabled">SONNERIE DÉSACTIVÉE</string>
     <string name="activate_calls">ACTIVER LES APPELS</string>
-    <string name="activate_launcher">DÉFINIR EN LAUNCHER PAR DÉFAUT</string>
+    <string name="activate_launcher">DÉFINIR EN LAUNCHER</string>
+    <string name="pin_app">ÉPINGLER L\'APPLICATION</string>
 
     <!-- ==================== INCOMING CALL ==================== -->
     <string name="incoming_call">Appel entrant</string>
@@ -86,7 +87,7 @@
     <!-- Support-->
     <string name="support">Soutien</string>
     <string name="buy_me_coffee">M\'offrir un café</string>
-    <string name="settings_footer_message">100% gratuit, 100% open source,\ndéveloppé avec ❤️ pour ma grand mère</string>
+    <string name="settings_footer_message" formatted="false">100% gratuit, 100% open source,\ndéveloppé avec ❤️ pour ma grand mère</string>
 
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
@@ -174,6 +175,6 @@
     <string name="onboarding_default_dialer_message">Pour gérer les appels entrants, cette application doit être définie comme votre *application par défaut*.</string>
     <string name="onboarding_default_launcher_title">Définir en launcher</string>
     <string name="onboarding_default_launcher_message">Pour que l\'application démarre automatiquement, définissez-la comme votre *launcher*.</string>
-    <string name="onboarding_pinned_mode_title">Sortir du mode épinglé</string>
-    <string name="onboarding_pinned_mode_message">Si l\'application est épinglée, maintenez *Retour* + *Aperçu* (navigation classique) ou maintenez le bas de l\'écran (navigation gestuelle) pour désépingler.</string>
+    <string name="onboarding_pinned_mode_title">Épingler l\'application</string>
+    <string name="onboarding_pinned_mode_message">Si l\'application est épinglée, maintenez ◄ + ■ (navigation classique) ou maintenez le bas de l\'écran (navigation gestuelle) pour désépingler.</string>
 </resources>

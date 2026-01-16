@@ -54,7 +54,6 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
     // 6: Default Dialer
     // 7: Default Launcher
     // 8: Admin Explanation
-    // 9: Pinned Mode Explanation
 
     val contactLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -87,7 +86,6 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                     3, 6 -> Icons.Default.Phone
                     4, 5 -> Icons.Default.LocationOn
                     7 -> Icons.Default.Home // Need Home icon import
-                    9 -> Icons.Default.Lock
                     else -> Icons.Default.Info
                 },
                 contentDescription = null
@@ -104,8 +102,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                     5 -> R.string.onboarding_auth_location_request_title
                     6 -> R.string.onboarding_default_dialer_title
                     7 -> R.string.onboarding_default_launcher_title
-                    8 -> R.string.onboarding_admin_intro_title
-                    else -> R.string.onboarding_pinned_mode_title
+                    else -> R.string.onboarding_admin_intro_title
                 }),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
@@ -123,8 +120,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         5 -> R.string.onboarding_auth_location_request_message
                         6 -> R.string.onboarding_default_dialer_message
                         7 -> R.string.onboarding_default_launcher_message
-                        8 -> R.string.onboarding_admin_intro_message
-                        else -> R.string.onboarding_pinned_mode_message
+                        else -> R.string.onboarding_admin_intro_message
                     })),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Start
@@ -161,7 +157,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         if (tapCount == 0) {
                             tapCount++
                         } else {
-                            step++
+                            onDismiss()
                         }
                     },
                     modifier = Modifier
@@ -178,37 +174,6 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         lineHeight = 16.sp
-                    )
-                }
-            } else if (step == 9) {
-                // Pinned Mode Step Logic (Wait 5s)
-                var canProceed by remember { mutableStateOf(false) }
-                var timeLeft by remember { mutableStateOf(5) }
-
-                LaunchedEffect(Unit) {
-                    while (timeLeft > 0) {
-                        delay(1000)
-                        timeLeft--
-                    }
-                    canProceed = true
-                }
-
-                Button(
-                    onClick = {
-                        onDismiss()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp),
-                    enabled = canProceed,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ConfirmGreen 
-                    )
-                ) {
-                    Text(
-                        text = if (canProceed) stringResource(id = R.string.validate) else "${stringResource(R.string.validate)} ($timeLeft)",
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center
                     )
                 }
             } else {

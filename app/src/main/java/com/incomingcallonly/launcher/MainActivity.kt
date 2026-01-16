@@ -29,6 +29,7 @@ import com.incomingcallonly.launcher.ui.theme.SystemBarsColor
 import androidx.compose.material3.MaterialTheme
 import com.incomingcallonly.launcher.util.LocaleHelper
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.activity.viewModels
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -76,6 +77,9 @@ class MainActivity : ComponentActivity() {
                     IncomingCallOnlyNavGraph(
                         onUnpin = {
                             kioskManager.stopKioskMode(this@MainActivity)
+                        },
+                        onPin = {
+                            kioskManager.startKioskMode(this@MainActivity)
                         },
                         onShowSystemUI = {
                             kioskManager.showSystemUI(this@MainActivity)
@@ -125,6 +129,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        kioskManager.startKioskMode(this)
+        // Ensure kiosk state stays in sync when returning to activity
+        kioskManager.syncKioskState(this)
     }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Some system gestures that unpin may change window focus; refresh state
+        if (hasFocus) {
+            kioskManager.syncKioskState(this)
+        }
+    }
+
+
 }

@@ -26,6 +26,7 @@
     <string name="ringer_disabled">RINGER OFF</string>
     <string name="activate_calls">ENABLE CALLS</string>
     <string name="activate_launcher">MAKE DEFAULT LAUNCHER</string>
+    <string name="pin_app">PIN APP</string>
 
     <!-- ==================== INCOMING CALL ==================== -->
     <string name="incoming_call">Incoming call</string>
@@ -86,7 +87,7 @@
     <!-- Support -->
     <string name="support">Support</string>
     <string name="buy_me_coffee">Buy me a coffee</string>
-    <string name="settings_footer_message">100% free, 100% open source,\nmade with ❤️ for my grandmother</string>
+    <string name="settings_footer_message" formatted="false">100% free, 100% open source,\nmade with ❤️ for my grandmother</string>
 
     <!-- ==================== ADMIN: DISPLAY & POWER ==================== -->
     <!-- Screen Behavior -->
@@ -174,6 +175,6 @@
     <string name="onboarding_default_dialer_message">To handle incoming calls effectively, this app needs to be set as your *default phone app*.</string>
     <string name="onboarding_default_launcher_title">Set as Home App</string>
     <string name="onboarding_default_launcher_message">To complete the setup, define this app as your *home launcher* so it starts automatically.</string>
-    <string name="onboarding_pinned_mode_title">Exit Pinned Mode</string>
-    <string name="onboarding_pinned_mode_message">If the app is pinned, hold *Back* + *Overview* (classic navigation) or hold the bottom of the screen (gesture navigation) to unpin.</string>
+    <string name="onboarding_pinned_mode_title">Pin the application</string>
+    <string name="onboarding_pinned_mode_message">If the app is pinned, hold ◄ + ■ (classic navigation) or hold the bottom of the screen (gesture navigation) to unpin.</string>
 </resources>

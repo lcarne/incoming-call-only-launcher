@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,11 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.ui.components.DepthIcon
+import com.incomingcallonly.launcher.ui.theme.HighContrastButtonBg
 
 @Composable
 fun DefaultAppPrompts(
     isDefaultDialer: Boolean,
-    isDefaultLauncher: Boolean
+    isDefaultLauncher: Boolean,
+    isPinned: Boolean = true,
+    onPinClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -113,6 +117,29 @@ fun DefaultAppPrompts(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.activate_launcher),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        // Pin app button - visible when the app is not pinned
+        if (!isPinned) {
+            androidx.compose.material3.Button(
+                onClick = { onPinClick() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                DepthIcon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.pin_app),
                     textAlign = TextAlign.Center
                 )
             }

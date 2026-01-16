@@ -11,6 +11,7 @@ import com.incomingcallonly.launcher.ui.home.HomeScreen
 @Composable
 fun IncomingCallOnlyNavGraph(
     onUnpin: () -> Unit, // Callback to exit Kiosk mode
+    onPin: () -> Unit = {},
     onShowSystemUI: () -> Unit = {},
     onHideSystemUI: () -> Unit = {}
 ) {
@@ -21,7 +22,8 @@ fun IncomingCallOnlyNavGraph(
             val viewModel = hiltViewModel<com.incomingcallonly.launcher.ui.home.HomeViewModel>()
             HomeScreen(
                 viewModel = viewModel,
-                onAdminClick = { navController.navigate("admin") }
+                onAdminClick = { navController.navigate("admin") },
+                onPinClick = onPin
             )
         }
         composable("admin") {

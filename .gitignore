@@ -25,6 +25,7 @@ render.experimental.xml
 
 # VSCode
 .vscode/
+.agent/
 
 # Keystore files
 *.jks

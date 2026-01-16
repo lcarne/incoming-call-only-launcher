@@ -8,14 +8,17 @@ import androidx.lifecycle.ViewModel
 import com.incomingcallonly.launcher.data.repository.SettingsRepository
 import com.incomingcallonly.launcher.manager.ScreenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val screenManager: ScreenManager
+    private val screenManager: ScreenManager,
+    private val kioskManager: com.incomingcallonly.launcher.manager.KioskManager
 ) : ViewModel() {
 
     val screenBehaviorPlugged = settingsRepository.screenBehaviorPlugged
@@ -29,6 +32,23 @@ class HomeViewModel @Inject constructor(
     val timeFormat = settingsRepository.timeFormat
     val isNightModeEnabled = settingsRepository.isNightModeEnabled
     val hasSeenOnboarding = settingsRepository.hasSeenOnboarding
+
+    private val _isPinned = MutableStateFlow(false)
+    val isPinned = _isPinned.asStateFlow()
+
+    init {
+        // Keep ViewModel state in sync with KioskManager's flow
+        viewModelScope.launch {
+            kioskManager.isKioskActive.collect { active ->
+                _isPinned.value = active
+            }
+        }
+    }
+
+    fun refreshPinStatus() {
+        // Read the KioskManager's StateFlow to avoid race conditions with Activity lock task state
+        _isPinned.value = kioskManager.isKioskActive.value
+    }
 
 
     private val _isDefaultDialer = MutableStateFlow(true)

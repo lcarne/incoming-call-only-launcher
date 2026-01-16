@@ -11,6 +11,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.incomingcallonly.launcher.receivers.IncomingCallOnlyAdminReceiver
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,6 +23,9 @@ import javax.inject.Singleton
 class KioskManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+
+    private val _isKioskActive = MutableStateFlow(false)
+    val isKioskActive: StateFlow<Boolean> = _isKioskActive.asStateFlow()
 
     fun hideSystemUI(activity: Activity) {
         val windowInsetsController =
@@ -87,14 +95,36 @@ class KioskManager @Inject constructor(
             if (am.lockTaskModeState == android.app.ActivityManager.LOCK_TASK_MODE_NONE) {
                 activity.startLockTask()
             }
+            // Start monitoring for state change because System might show a confirmation dialog
+            // and we won't get a callback until the user accepts.
+            startStateMonitoring(activity)
+            
         } catch (e: Exception) {
             e.printStackTrace()
+            syncKioskState(activity)
+        }
+    }
+
+    private fun startStateMonitoring(activity: Activity) {
+        // Poll for 15 seconds
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+            repeat(30) {
+                syncKioskState(activity)
+                if (_isKioskActive.value) {
+                    // State detected as Active, stop polling
+                    return@launch
+                }
+                delay(500)
+            }
+            // Final check
+            syncKioskState(activity)
         }
     }
 
     fun stopKioskMode(activity: Activity) {
         try {
             activity.stopLockTask()
+            _isKioskActive.value = false
             val dpm = activity.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
             val adminComponent = ComponentName(activity, IncomingCallOnlyAdminReceiver::class.java)
             if (dpm.isDeviceOwnerApp(activity.packageName)) {
@@ -104,4 +134,22 @@ class KioskManager @Inject constructor(
             e.printStackTrace()
         }
     }
-}
+
+    fun isKioskModeActive(activity: Activity): Boolean {
+        return try {
+            val am = activity.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            am.lockTaskModeState != android.app.ActivityManager.LOCK_TASK_MODE_NONE
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Re-read the system lock task mode and update the internal StateFlow.
+     * Useful to detect user-initiated unpin (e.g. system gesture) when
+     * Activity.onLockTaskModeChanged override is not available.
+     */
+    fun syncKioskState(activity: Activity) {
+        _isKioskActive.value = isKioskModeActive(activity)
+    }
+} 

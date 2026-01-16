@@ -47,19 +47,37 @@ import com.incomingcallonly.launcher.ui.theme.DimmedClockColor
 import com.incomingcallonly.launcher.ui.theme.HighContrastButtonBg
 import com.incomingcallonly.launcher.ui.theme.SystemBarsColor
 import java.util.Calendar
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import com.incomingcallonly.launcher.R
+import com.incomingcallonly.launcher.ui.theme.ConfirmGreen
+import com.incomingcallonly.launcher.ui.theme.ErrorRed
+import com.incomingcallonly.launcher.ui.onboarding.parseBoldString
 
 private const val MINUTES_IN_HOUR = 60
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onAdminClick: () -> Unit
+    onAdminClick: () -> Unit,
+    onPinClick: () -> Unit
 ) {
     // 1. Time & System Monitoring
     val currentTime = rememberCurrentTime()
     val isPlugged = rememberIsPlugged()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    // 1.a Pin status
+    val isPinned by viewModel.isPinned.collectAsState(initial = false)
+    var showPinConfirmation by remember { mutableStateOf(false) }
 
     // 2. Settings State
     val screenBehaviorPlugged by viewModel.screenBehaviorPlugged.collectAsState(initial = SettingsRepository.SCREEN_BEHAVIOR_AWAKE)
@@ -91,7 +109,7 @@ fun HomeScreen(
     val isNightInSchedule = if (startTotalMinutes < endTotalMinutes) {
         currentTotalMinutes in startTotalMinutes until endTotalMinutes
     } else {
-        currentTotalMinutes >= startTotalMinutes || currentTotalMinutes < endTotalMinutes
+        currentTotalMinutes !in endTotalMinutes..<startTotalMinutes
     }
     val isNight = isNightModeEnabled && isNightInSchedule
 
@@ -108,6 +126,7 @@ fun HomeScreen(
         val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
             if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
                 viewModel.refreshDefaultAppStatus(context)
+                viewModel.refreshPinStatus()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -115,6 +134,7 @@ fun HomeScreen(
     }
     LaunchedEffect(Unit) {
         viewModel.refreshDefaultAppStatus(context)
+        viewModel.refreshPinStatus()
         // Schedule the night mode end alarm on app start
         NightModeScheduler.scheduleNightModeEnd(context)
     }
@@ -165,10 +185,59 @@ fun HomeScreen(
                  nightEndMin = nightEndMin,
                  isNight = isNight,
                  isDefaultDialer = isDefaultDialer,
-                 isDefaultLauncher = isDefaultLauncher
+                 isDefaultLauncher = isDefaultLauncher,
+                 isPinned = isPinned,
+                 onPinClick = { showPinConfirmation = true }
              )
         } else {
              HomeContentDimmed(currentTime, savedFormat)
+        }
+
+        if (showPinConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showPinConfirmation = false },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.onboarding_pinned_mode_title),
+                        style = MaterialTheme.typography.headlineSmall,
+                        textAlign = TextAlign.Center
+                    )
+                },
+                text = {
+                    Text(
+                        text = parseBoldString(stringResource(id = R.string.onboarding_pinned_mode_message)),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Start
+                    )
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = { showPinConfirmation = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text(stringResource(id = R.string.cancel))
+                        }
+                        Button(
+                            onClick = {
+                                showPinConfirmation = false
+                                onPinClick()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = ConfirmGreen),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(stringResource(id = R.string.validate))
+                        }
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         if (!hasSeenOnboarding) {
@@ -191,7 +260,9 @@ private fun HomeContentNormal(
     nightEndMin: Int,
     isNight: Boolean,
     isDefaultDialer: Boolean,
-    isDefaultLauncher: Boolean
+    isDefaultLauncher: Boolean,
+    isPinned: Boolean,
+    onPinClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -241,10 +312,12 @@ private fun HomeContentNormal(
         // Default Apps Prompt
         DefaultAppPrompts(
             isDefaultDialer = isDefaultDialer,
-            isDefaultLauncher = isDefaultLauncher
+            isDefaultLauncher = isDefaultLauncher,
+            isPinned = isPinned,
+            onPinClick = onPinClick
         )
     }
-}
+} 
 
 @Composable
 private fun HomeContentDimmed(
