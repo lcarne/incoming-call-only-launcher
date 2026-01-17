@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -41,15 +40,8 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
 
     // Stepping Logic:
     // 0: Presentation
-    // 1: Authorization Requests Explanation
-    // 3: Request Phone State
     // 4: Location Explanation
     // 6: Admin Explanation
-
-    val phoneLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { step = 4 }
-    )
 
     val locationLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -58,24 +50,19 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
 
     val currentIcon = when (step) {
         0 -> Icons.Default.Info
-        1, 6 -> Icons.Default.Lock
-        3 -> Icons.Default.Phone
         4 -> Icons.Default.LocationOn
+        6 -> Icons.Default.Lock
         else -> Icons.Default.Info
     }
 
     val currentTitle = stringResource(id = when (step) {
         0 -> R.string.onboarding_presentation_title
-        1 -> R.string.onboarding_auth_intro_title
-        3 -> R.string.onboarding_auth_calls_title
         4 -> R.string.onboarding_auth_location_intro_title
         else -> R.string.onboarding_admin_intro_title
     })
 
     val currentMessage = stringResource(id = when (step) {
         0 -> R.string.onboarding_presentation_message
-        1 -> R.string.onboarding_auth_intro_message
-        3 -> R.string.onboarding_auth_calls_message
         4 -> R.string.onboarding_auth_location_intro_message
         else -> R.string.onboarding_admin_intro_message
     })
@@ -150,18 +137,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                 Button(
                     onClick = {
                         when (step) {
-                            0 -> step = 1
-                            1 -> step = 3
-                            3 -> {
-                                val permissions = mutableListOf(
-                                    android.Manifest.permission.READ_PHONE_STATE,
-                                    android.Manifest.permission.ANSWER_PHONE_CALLS
-                                )
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                                    permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                phoneLauncher.launch(permissions.toTypedArray())
-                            }
+                            0 -> step = 4
                             4 -> locationLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
                         }
                     },
@@ -170,20 +146,16 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         .heightIn(min = 56.dp)
                 ) {
                     // Display logic:
-                    // 0 -> 1/5
-                    // 1 -> 2/5
-                    // 3 -> 3/5
-                    // 4 -> 4/5
+                    // 0 -> 1/3
+                    // 4 -> 2/3
                     val currentStepDisplay = when(step) {
                         0 -> 1
-                        1 -> 2
-                        3 -> 3
-                        4 -> 4
+                        4 -> 2
                         else -> 0
                     }
-                    val buttonText = stringResource(id = if (step in listOf(3, 4)) R.string.validate else R.string.next)
+                    val buttonText = stringResource(id = if (step == 4) R.string.validate else R.string.next)
                     Text(
-                        text = if (currentStepDisplay > 0) "$buttonText ($currentStepDisplay/5)" else buttonText,
+                        text = if (currentStepDisplay > 0) "$buttonText ($currentStepDisplay/3)" else buttonText,
                         fontSize = 18.sp
                     )
                 }
