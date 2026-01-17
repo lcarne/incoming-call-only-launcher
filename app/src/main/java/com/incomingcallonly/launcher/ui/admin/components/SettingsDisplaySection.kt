@@ -45,7 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.incomingcallonly.launcher.R
-import com.incomingcallonly.launcher.ui.admin.AdminViewModel
+import com.incomingcallonly.launcher.ui.admin.SettingsViewModel
 import com.incomingcallonly.launcher.ui.admin.dialogs.ScreenBehaviorDialog
 import com.incomingcallonly.launcher.ui.admin.dialogs.TimePickerDialogWrapper
 import com.incomingcallonly.launcher.ui.theme.HighContrastButtonBg
@@ -54,7 +54,7 @@ import com.incomingcallonly.launcher.util.TimeFormatUtils
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsDisplaySection(viewModel: AdminViewModel) {
+fun SettingsDisplaySection(viewModel: SettingsViewModel) {
     // Top-level state hoisting
     val screenBehaviorPlugged by viewModel.screenBehaviorPlugged.collectAsState()
     var showPluggedDialog by remember { mutableStateOf(false) }
@@ -173,7 +173,7 @@ fun SettingsDisplaySection(viewModel: AdminViewModel) {
 }
 
 @Composable
-fun NightModeSettings(viewModel: AdminViewModel) {
+fun NightModeSettings(viewModel: SettingsViewModel) {
     val nightStart by viewModel.nightModeStartHour.collectAsState()
     val nightStartMin by viewModel.nightModeStartMinute.collectAsState()
     val nightEnd by viewModel.nightModeEndHour.collectAsState()
@@ -284,7 +284,7 @@ fun NightModeSettings(viewModel: AdminViewModel) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ClockColorSelector(viewModel: AdminViewModel) {
+fun ClockColorSelector(viewModel: SettingsViewModel) {
     // Enhanced color palette with vibrant, accessible colors (all WCAG AA compliant on dark backgrounds)
     val colors = listOf(
         // Material You dynamic colors

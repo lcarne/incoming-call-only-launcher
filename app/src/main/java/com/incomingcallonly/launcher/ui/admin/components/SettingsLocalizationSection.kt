@@ -37,11 +37,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.incomingcallonly.launcher.R
-import com.incomingcallonly.launcher.ui.admin.AdminViewModel
+import com.incomingcallonly.launcher.ui.admin.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsLocalizationSection(viewModel: AdminViewModel) {
+fun SettingsLocalizationSection(viewModel: SettingsViewModel) {
     val lang by viewModel.language.collectAsState()
     val currentFormat by viewModel.timeFormat.collectAsState()
     val context = LocalContext.current

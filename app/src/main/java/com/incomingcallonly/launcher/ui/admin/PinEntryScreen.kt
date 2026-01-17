@@ -51,7 +51,7 @@ import com.incomingcallonly.launcher.ui.components.DepthIcon
 
 @Composable
 fun PinEntryScreen(
-    viewModel: AdminViewModel,
+    viewModel: AuthViewModel,
     onExit: () -> Unit
 ) {
     var pin by remember { mutableStateOf("") }

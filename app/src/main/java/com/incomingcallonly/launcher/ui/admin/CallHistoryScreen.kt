@@ -58,7 +58,7 @@ private val COLOR_BLOCKED = Color.Gray
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallHistoryScreen(
-    viewModel: AdminViewModel,
+    viewModel: SettingsViewModel,
     onBack: () -> Unit
 ) {
     val callLogs by viewModel.callLogs.collectAsState()

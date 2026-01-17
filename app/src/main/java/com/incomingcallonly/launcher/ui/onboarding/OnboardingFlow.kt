@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,47 +35,43 @@ import com.incomingcallonly.launcher.ui.theme.ConfirmGreen
 import com.incomingcallonly.launcher.ui.theme.ErrorRed
 import kotlinx.coroutines.delay
 
+sealed class OnboardingStep {
+    object Presentation : OnboardingStep()
+    object LocationPermission : OnboardingStep()
+    object AdminDefinition : OnboardingStep()
+}
+
 @Composable
 fun OnboardingFlow(onDismiss: () -> Unit) {
-    var step by remember { mutableIntStateOf(0) }
-
-    // Stepping Logic:
-    // 0: Presentation
-    // 4: Location Explanation
-    // 6: Admin Explanation
+    var step by remember { mutableStateOf<OnboardingStep>(OnboardingStep.Presentation) }
 
     val locationLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { step = 6 }
+        onResult = { step = OnboardingStep.AdminDefinition }
     )
 
     val currentIcon = when (step) {
-        0 -> Icons.Default.Info
-        4 -> Icons.Default.LocationOn
-        6 -> Icons.Default.Lock
-        else -> Icons.Default.Info
+        OnboardingStep.Presentation -> Icons.Default.Info
+        OnboardingStep.LocationPermission -> Icons.Default.LocationOn
+        OnboardingStep.AdminDefinition -> Icons.Default.Lock
     }
 
     val currentTitle = stringResource(id = when (step) {
-        0 -> R.string.onboarding_presentation_title
-        4 -> R.string.onboarding_auth_location_intro_title
-        else -> R.string.onboarding_admin_intro_title
+        OnboardingStep.Presentation -> R.string.onboarding_presentation_title
+        OnboardingStep.LocationPermission -> R.string.onboarding_auth_location_intro_title
+        OnboardingStep.AdminDefinition -> R.string.onboarding_admin_intro_title
     })
 
     val currentMessage = stringResource(id = when (step) {
-        0 -> R.string.onboarding_presentation_message
-        4 -> R.string.onboarding_auth_location_intro_message
-        else -> R.string.onboarding_admin_intro_message
+        OnboardingStep.Presentation -> R.string.onboarding_presentation_message
+        OnboardingStep.LocationPermission -> R.string.onboarding_auth_location_intro_message
+        OnboardingStep.AdminDefinition -> R.string.onboarding_admin_intro_message
     })
 
     AppDialog(
         onDismissRequest = { /* Prevent dismissal */ },
         icon = currentIcon,
         title = currentTitle,
-        // For step 6, we use custom content to show the error message.
-        // For other steps, we just show the message using the simplified content slot
-        // or just passing message if separate. 
-        // Since we want consistent aligned text, we use content slot with parseBoldString.
         content = {
             Column {
                 Text(
@@ -83,7 +80,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                     textAlign = TextAlign.Start
                 )
                 
-                if (step == 6) {
+                if (step is OnboardingStep.AdminDefinition) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(id = R.string.onboarding_important),
@@ -96,7 +93,7 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
             }
         },
         buttons = {
-            if (step == 6) {
+            if (step is OnboardingStep.AdminDefinition) {
                 // Admin Step Logic (Double Tap)
                 var tapCount by remember { mutableIntStateOf(0) }
 
@@ -137,8 +134,9 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                 Button(
                     onClick = {
                         when (step) {
-                            0 -> step = 4
-                            4 -> locationLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            OnboardingStep.Presentation -> step = OnboardingStep.LocationPermission
+                            OnboardingStep.LocationPermission -> locationLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            else -> {}
                         }
                     },
                     modifier = Modifier
@@ -146,14 +144,14 @@ fun OnboardingFlow(onDismiss: () -> Unit) {
                         .heightIn(min = 56.dp)
                 ) {
                     // Display logic:
-                    // 0 -> 1/3
-                    // 4 -> 2/3
+                    // Presentation -> 1/3
+                    // Location -> 2/3
                     val currentStepDisplay = when(step) {
-                        0 -> 1
-                        4 -> 2
+                        OnboardingStep.Presentation -> 1
+                        OnboardingStep.LocationPermission -> 2
                         else -> 0
                     }
-                    val buttonText = stringResource(id = if (step == 4) R.string.validate else R.string.next)
+                    val buttonText = stringResource(id = if (step is OnboardingStep.LocationPermission) R.string.validate else R.string.next)
                     Text(
                         text = if (currentStepDisplay > 0) "$buttonText ($currentStepDisplay/3)" else buttonText,
                         fontSize = 18.sp

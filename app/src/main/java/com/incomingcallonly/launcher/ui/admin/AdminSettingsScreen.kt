@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -65,8 +66,11 @@ import com.incomingcallonly.launcher.ui.components.DepthIcon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminSettingsScreen(
-    viewModel: AdminViewModel,
+    settingsViewModel: SettingsViewModel,
+    contactsViewModel: ContactsViewModel,
+    authViewModel: AuthViewModel,
     onExit: () -> Unit,
+    onLogout: () -> Unit,
     onUnpin: () -> Unit,
     onManageContacts: () -> Unit,
     onShowHistory: () -> Unit
@@ -105,7 +109,7 @@ fun AdminSettingsScreen(
             AdminDangerButton(
                     text = stringResource(R.string.confirm),
                     onClick = {
-                        viewModel.deleteAllData()
+                        settingsViewModel.deleteAllData()
                         showResetDataDialog = false
                     }
                 )
@@ -136,7 +140,7 @@ fun AdminSettingsScreen(
             AdminDangerButton( // Changed to DangerButton as requested
                     text = stringResource(R.string.confirm),
                     onClick = {
-                        viewModel.resetSettings()
+                        settingsViewModel.resetSettings()
                         showResetSettingsDialog = false
                     }
                 )
@@ -152,20 +156,42 @@ fun AdminSettingsScreen(
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json"),
         onResult = { uri ->
-            uri?.let { viewModel.exportContacts(it) }
+            uri?.let { contactsViewModel.exportContacts(it) }
         }
     )
 
     val importLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
         onResult = { uri ->
-            uri?.let { viewModel.importContacts(it) }
+            uri?.let { contactsViewModel.importContacts(it) }
         }
     )
+
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+    val importExportState by contactsViewModel.importExportState.collectAsState()
+
+    androidx.compose.runtime.LaunchedEffect(importExportState) {
+        importExportState?.let { result ->
+            when (result) {
+                is com.incomingcallonly.launcher.ui.admin.Result.Success -> {
+                    snackbarHostState.showSnackbar(result.data)
+                    contactsViewModel.resetImportExportState()
+                }
+                is com.incomingcallonly.launcher.ui.admin.Result.Error -> {
+                    snackbarHostState.showSnackbar(result.message ?: "Unknown error")
+                    contactsViewModel.resetImportExportState()
+                }
+                is com.incomingcallonly.launcher.ui.admin.Result.Loading -> {
+                     // Optionally show loading indicator
+                }
+            }
+        }
+    }
 
     Scaffold(
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { 
@@ -218,7 +244,7 @@ fun AdminSettingsScreen(
                     },
                     modifier = Modifier.clickable {
                         onUnpin()
-                        viewModel.logout()
+                        onLogout()
                         onExit()
                     }
                 )
@@ -238,7 +264,7 @@ fun AdminSettingsScreen(
                         )
                     },
                     modifier = Modifier.clickable {
-                        viewModel.logout()
+                        onLogout()
                         onExit()
                     }
                 )
@@ -295,7 +321,7 @@ fun AdminSettingsScreen(
             )
 
             // Settings Section
-            SettingsSection(viewModel)
+            SettingsSection(settingsViewModel, authViewModel)
 
             // Data Management
             AdminSectionHeader(text = stringResource(id = R.string.data_management))
@@ -420,9 +446,9 @@ fun AdminSettingsScreen(
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsSection(viewModel: AdminViewModel) {
+fun SettingsSection(viewModel: SettingsViewModel, authViewModel: AuthViewModel) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        SettingsSystemSection(viewModel)
+        SettingsSystemSection(viewModel, authViewModel)
         SettingsAudioSection(viewModel)
         SettingsDisplaySection(viewModel)
         SettingsLocalizationSection(viewModel)

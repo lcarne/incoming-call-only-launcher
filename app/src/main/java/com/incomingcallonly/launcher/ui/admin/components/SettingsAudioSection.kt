@@ -32,12 +32,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.incomingcallonly.launcher.R
-import com.incomingcallonly.launcher.ui.admin.AdminViewModel
+import com.incomingcallonly.launcher.ui.admin.SettingsViewModel
 import com.incomingcallonly.launcher.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsAudioSection(viewModel: AdminViewModel) {
+fun SettingsAudioSection(viewModel: SettingsViewModel) {
     Column {
         AdminSectionHeader(text = stringResource(id = R.string.settings_section_audio)) // Assuming you add this string, or reuse an existing one if appropriate. Wait, the original didn't have a header call here but AdminSettingsScreen might have been updated. 
         // Actually AdminSettingsScreen calls SettingsAudioSection directly.

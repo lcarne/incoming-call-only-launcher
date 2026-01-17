@@ -21,9 +21,11 @@ fun AdminScreen(
     onUnpin: () -> Unit,
     onShowSystemUI: () -> Unit = {},
     onHideSystemUI: () -> Unit = {},
-    viewModel: AdminViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    contactsViewModel: ContactsViewModel = hiltViewModel()
 ) {
-    val isAuthenticated by viewModel.isAuthenticated.collectAsState()
+    val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
     // Show system bars when entering admin screens
     androidx.compose.runtime.DisposableEffect(Unit) {
@@ -35,12 +37,15 @@ fun AdminScreen(
 
     if (!isAuthenticated) {
         PinEntryScreen(
-            viewModel = viewModel,
+            viewModel = authViewModel,
             onExit = onExit
         )
     } else {
         AdminContent(
-            viewModel = viewModel,
+            settingsViewModel = settingsViewModel,
+            contactsViewModel = contactsViewModel,
+            authViewModel = authViewModel,
+            onLogout = { authViewModel.logout() },
             onExit = onExit,
             onUnpin = onUnpin
         )
@@ -49,7 +54,10 @@ fun AdminScreen(
 
 @Composable
 fun AdminContent(
-    viewModel: AdminViewModel,
+    settingsViewModel: SettingsViewModel,
+    contactsViewModel: ContactsViewModel,
+    authViewModel: AuthViewModel,
+    onLogout: () -> Unit,
     onExit: () -> Unit,
     onUnpin: () -> Unit
 ) {
@@ -65,7 +73,7 @@ fun AdminContent(
         when (currentView) {
             "CONTACTS" -> {
                 ContactManagementScreen(
-                    viewModel = viewModel,
+                    viewModel = contactsViewModel,
                     onBack = { currentView = "SETTINGS" },
                     onOpenCamera = { onCaptured ->
                         pendingPhotoCaptured = onCaptured
@@ -76,15 +84,18 @@ fun AdminContent(
 
             "HISTORY" -> {
                 CallHistoryScreen(
-                    viewModel = viewModel,
+                    viewModel = settingsViewModel,
                     onBack = { currentView = "SETTINGS" }
                 )
             }
 
             else -> {
                 AdminSettingsScreen(
-                    viewModel = viewModel,
+                    settingsViewModel = settingsViewModel,
+                    contactsViewModel = contactsViewModel,
+                    authViewModel = authViewModel,
                     onExit = onExit,
+                    onLogout = onLogout,
                     onUnpin = onUnpin,
                     onManageContacts = { currentView = "CONTACTS" },
                     onShowHistory = { currentView = "HISTORY" }

@@ -25,32 +25,44 @@ class ContactRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAllContacts() = contactDao.deleteAllContacts()
 
-    override suspend fun exportContacts(): String {
+    override suspend fun exportContacts(outputStream: java.io.OutputStream) {
         val contacts = contactDao.getContactsList()
-        val exportList = contacts.map { contact ->
-            val photoBase64 = contact.photoUri?.let { uriString ->
-                try {
-                    val uri = android.net.Uri.parse(uriString)
-                    context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                        val bytes = inputStream.readBytes()
-                        android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+        outputStream.bufferedWriter().use { writer ->
+            val jsonWriter = com.google.gson.stream.JsonWriter(writer)
+            jsonWriter.beginArray()
+            
+            contacts.forEach { contact ->
+                jsonWriter.beginObject()
+                
+                val names = contact.name.split(" ")
+                val firstName = if (names.isNotEmpty()) names.first() else ""
+                val lastName = if (names.size > 1) names.drop(1).joinToString(" ") else ""
+                
+                jsonWriter.name("firstName").value(firstName)
+                jsonWriter.name("lastName").value(lastName)
+                jsonWriter.name("phoneNumber").value(contact.phoneNumber)
+                
+                val photoBase64 = contact.photoUri?.let { uriString ->
+                    try {
+                        val uri = android.net.Uri.parse(uriString)
+                        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                            val bytes = inputStream.readBytes()
+                            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+                        }
+                    } catch (e: Exception) {
+                        null
                     }
-                } catch (e: Exception) {
-                    null
                 }
+                
+                if (photoBase64 != null) {
+                    jsonWriter.name("photoBase64").value(photoBase64)
+                }
+                
+                jsonWriter.endObject()
             }
-            val names = contact.name.split(" ")
-            val firstName = if (names.isNotEmpty()) names.first() else ""
-            val lastName = if (names.size > 1) names.drop(1).joinToString(" ") else ""
-
-            com.incomingcallonly.launcher.data.model.ContactExportDto(
-                firstName = firstName,
-                lastName = lastName,
-                phoneNumber = contact.phoneNumber,
-                photoBase64 = photoBase64
-            )
+            
+            jsonWriter.endArray()
         }
-        return com.google.gson.Gson().toJson(exportList)
     }
 
     override suspend fun importContacts(json: String): Int {

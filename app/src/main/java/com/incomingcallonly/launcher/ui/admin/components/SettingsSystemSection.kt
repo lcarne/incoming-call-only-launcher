@@ -20,11 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.incomingcallonly.launcher.R
-import com.incomingcallonly.launcher.ui.admin.AdminViewModel
+import com.incomingcallonly.launcher.ui.admin.AuthViewModel
+import com.incomingcallonly.launcher.ui.admin.SettingsViewModel
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 
 @Composable
-fun SettingsSystemSection(viewModel: AdminViewModel) {
+fun SettingsSystemSection(viewModel: SettingsViewModel, authViewModel: AuthViewModel) {
     Column(modifier = Modifier.fillMaxWidth()) {
         AdminSectionHeader(text = stringResource(id = R.string.settings_section_system))
 
@@ -45,13 +49,19 @@ fun SettingsSystemSection(viewModel: AdminViewModel) {
 
             AdminDivider()
 
-            // PIN Management
+            val adminPin by authViewModel.adminPin.collectAsState()
             var showChangePinDialog by remember { mutableStateOf(false) }
-            
+
             ListItem(
-                colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.change_pin)) },
-                supportingContent = { Text(stringResource(id = R.string.change_pin_desc)) },
+                supportingContent = { Text("****") }, // Don't show actual PIN
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null
+                    )
+                },
                 modifier = Modifier.clickable { showChangePinDialog = true }
             )
 
@@ -61,8 +71,6 @@ fun SettingsSystemSection(viewModel: AdminViewModel) {
                 var newPin by remember { mutableStateOf("") }
                 var confirmPin by remember { mutableStateOf("") }
                 var errorResId by remember { mutableStateOf<Int?>(null) }
-                
-                val currentPinValue by viewModel.adminPin.collectAsState()
 
                 AdminDialog(
                     onDismissRequest = { showChangePinDialog = false },
@@ -139,7 +147,7 @@ fun SettingsSystemSection(viewModel: AdminViewModel) {
                             onClick = {
                                 when (step) {
                                     1 -> {
-                                        if (previousPin == currentPinValue) {
+                                        if (previousPin == adminPin) {
                                             step = 2
                                             errorResId = null
                                         } else {
@@ -151,7 +159,7 @@ fun SettingsSystemSection(viewModel: AdminViewModel) {
                                     }
                                     3 -> {
                                         if (newPin == confirmPin) {
-                                            viewModel.changePin(newPin)
+                                            authViewModel.changePin(newPin)
                                             showChangePinDialog = false
                                         } else {
                                             errorResId = R.string.pins_do_not_match

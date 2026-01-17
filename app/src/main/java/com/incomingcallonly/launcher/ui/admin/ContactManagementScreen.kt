@@ -47,7 +47,7 @@ import com.incomingcallonly.launcher.ui.components.DepthIcon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactManagementScreen(
-    viewModel: AdminViewModel,
+    viewModel: ContactsViewModel,
     onBack: () -> Unit,
     onOpenCamera: ((android.net.Uri) -> Unit) -> Unit
 ) {

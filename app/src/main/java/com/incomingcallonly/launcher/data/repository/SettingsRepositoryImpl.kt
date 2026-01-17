@@ -14,8 +14,19 @@ import javax.inject.Singleton
 class SettingsRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SettingsRepository {
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("incomingcallonly_prefs", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences by lazy {
+        val masterKey = androidx.security.crypto.MasterKey.Builder(context)
+            .setKeyScheme(androidx.security.crypto.MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        androidx.security.crypto.EncryptedSharedPreferences.create(
+            context,
+            "secret_incomingcallonly_prefs",
+            masterKey,
+            androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
 
     private val _screenBehaviorPlugged =
         MutableStateFlow(prefs.getInt(KEY_SCREEN_BEHAVIOR_PLUGGED, SettingsRepository.SCREEN_BEHAVIOR_AWAKE))
