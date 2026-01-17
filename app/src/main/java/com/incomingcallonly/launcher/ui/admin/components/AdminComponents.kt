@@ -78,14 +78,16 @@ fun <T> AdminSelectionDialog(
     onOptionSelected: (T) -> Unit,
     onDismissRequest: () -> Unit,
     labelProvider: @Composable (T) -> String,
+    modifier: Modifier = Modifier,
     iconProvider: (@Composable (T) -> Unit)? = null,
     headerIcon: Any? = null,
 ) {
     AdminDialog(
         onDismissRequest = onDismissRequest,
         title = title,
+        modifier = modifier,
         icon = headerIcon,
-        confirmButton = {}, // Selection usually triggers action immediately or we just use dismiss
+        confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
                 Text(stringResource(id = R.string.cancel))
@@ -94,7 +96,7 @@ fun <T> AdminSelectionDialog(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp) // Tighter spacing than before (was 12+ dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             options.forEach { option ->
                 val isSelected = option == selectedOption
@@ -120,6 +122,7 @@ fun AdminSelectionItem(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
     val backgroundColor = if (isSelected) 
@@ -137,11 +140,11 @@ fun AdminSelectionItem(
         shape = RoundedCornerShape(12.dp),
         color = backgroundColor,
         tonalElevation = if (isSelected) 2.dp else 0.dp,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp), // Tighter padding
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (leadingIcon != null) {
@@ -309,11 +312,12 @@ fun AdminDivider(modifier: Modifier = Modifier) {
 fun AdminDialog(
     onDismissRequest: () -> Unit,
     title: String,
+    confirmButton: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     icon: Any? = null,
     iconContainerColor: Color? = null,
     iconTint: Color? = null,
     animated: Boolean = true,
-    confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
@@ -340,7 +344,7 @@ fun AdminDialog(
 
         IncomingCallOnlyTheme {
             Box(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(Spacing.sm)
                     .graphicsLayer {
@@ -358,7 +362,6 @@ fun AdminDialog(
                         shape = RoundedCornerShape(24.dp)
                     )
             ) {
-                // Gradient overlay
                 val isDark = isSystemInDarkTheme()
                 Box(
                     modifier = Modifier
@@ -453,10 +456,9 @@ fun AdminDialog(
 @Composable
 fun AdminIcon(
     painter: Painter,
-    contentDescription: String?,
+    modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    containerColor: Color = Color.Transparent,
-    modifier: Modifier = Modifier
+    containerColor: Color = Color.Transparent
 ) {
     if (containerColor != Color.Transparent) {
         Box(
@@ -467,7 +469,7 @@ fun AdminIcon(
         ) {
             DepthIcon(
                 painter = painter,
-                contentDescription = contentDescription,
+                contentDescription = null,
                 tint = tint,
                 modifier = Modifier.size(Spacing.iconLarge)
             )
@@ -475,7 +477,7 @@ fun AdminIcon(
     } else {
         DepthIcon(
             painter = painter,
-            contentDescription = contentDescription,
+            contentDescription = null,
             tint = tint,
             modifier = modifier.size(Spacing.iconLarge)
         )
@@ -485,10 +487,9 @@ fun AdminIcon(
 @Composable
 fun AdminIcon(
     imageVector: ImageVector,
-    contentDescription: String?,
+    modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    containerColor: Color = Color.Transparent,
-    modifier: Modifier = Modifier
+    containerColor: Color = Color.Transparent
 ) {
     if (containerColor != Color.Transparent) {
         Box(
@@ -499,7 +500,7 @@ fun AdminIcon(
         ) {
             DepthIcon(
                 imageVector = imageVector,
-                contentDescription = contentDescription,
+                contentDescription = null,
                 tint = tint,
                 modifier = Modifier.size(Spacing.iconLarge)
             )
@@ -507,7 +508,7 @@ fun AdminIcon(
     } else {
         DepthIcon(
             imageVector = imageVector,
-            contentDescription = contentDescription,
+            contentDescription = null,
             tint = tint,
             modifier = modifier.size(Spacing.iconLarge)
         )
@@ -568,8 +569,8 @@ fun ModernSegmentedButton(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .heightIn(min = 52.dp), // Slightly taller for better touch target and premium feel
-        shape = RoundedCornerShape(16.dp), // Less extreme than 100%, more modern
+            .heightIn(min = 52.dp),
+        shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.05f))
     ) {
@@ -702,11 +703,14 @@ fun AdminDangerButton(
 }
 
 @Composable
-fun AdminWarningText(text: String) {
+fun AdminWarningText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     Surface(
         color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f),
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = text,

@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Enable modern edge-to-edge display for stable background color extension
         enableEdgeToEdge()
 
         ringerManager.startObserving(lifecycleScope)
@@ -52,7 +51,6 @@ class MainActivity : ComponentActivity() {
         // Block back button
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Do nothing - block back button for kiosk mode
             }
         })
 
@@ -61,11 +59,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             IncomingCallOnlyTheme {
-                // Default System Bars Color: Transparent for edge-to-edge
-                // This allows background colors to extend behind system bars
                 SystemBarsColor(
-                    statusBarColor = androidx.compose.ui.graphics.Color.Transparent,
-                    navigationBarColor = androidx.compose.ui.graphics.Color.Transparent,
                     darkIcons = false
                 )
 
@@ -118,7 +112,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            // Block volume buttons
             return true
         }
         return super.onKeyDown(keyCode, event)
@@ -132,7 +125,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        // Some system gestures that unpin may change window focus; refresh state
         if (hasFocus) {
             kioskManager.syncKioskState(this)
         }

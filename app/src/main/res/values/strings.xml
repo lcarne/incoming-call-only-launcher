@@ -105,7 +105,10 @@
     <string name="night_mode_active_ringer_off">Ringer disabled\n(Night Mode\nfrom %1$s to %2$s)</string>
     <string name="night_start_label">Night start</string>
     <string name="night_end_label">Night end</string>
-    <string name="night_mode_duration_desc">Duration: %1$d hours %2$s</string>
+    <plurals name="night_mode_duration_desc">
+        <item quantity="one">Duration: %1$d hour %2$s</item>
+        <item quantity="other">Duration: %1$d hours %2$s</item>
+    </plurals>
     <string name="next_day">(until next day)</string>
     <string name="select_hour">Select hour</string>
 

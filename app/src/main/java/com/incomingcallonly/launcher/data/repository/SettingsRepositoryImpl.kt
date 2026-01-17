@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
-    @param:ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context
 ) : SettingsRepository {
     private val prefs: SharedPreferences by lazy {
         val masterKey = androidx.security.crypto.MasterKey.Builder(context)

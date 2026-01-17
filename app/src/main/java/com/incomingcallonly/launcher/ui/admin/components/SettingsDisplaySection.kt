@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -239,8 +240,9 @@ fun NightModeSettings(viewModel: SettingsViewModel) {
               )
               androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(8.dp))
               Text(
-                text = stringResource(
-                    id = R.string.night_mode_duration_desc,
+                text = pluralStringResource(
+                    id = R.plurals.night_mode_duration_desc,
+                    count = durationHours,
                     durationHours,
                     if (durationMinsOnly > 0) String.format(java.util.Locale.getDefault(), "%02d", durationMinsOnly) else "",
                     nextDay

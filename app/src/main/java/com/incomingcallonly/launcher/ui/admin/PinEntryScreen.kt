@@ -50,7 +50,8 @@ import com.incomingcallonly.launcher.ui.theme.SystemBarsColor
 @Composable
 fun PinEntryScreen(
     viewModel: AuthViewModel,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var pin by remember { mutableStateOf("") }
     val isError by viewModel.pinError.collectAsState()
@@ -59,14 +60,12 @@ fun PinEntryScreen(
     
     // System Bars Configuration
     SystemBarsColor(
-        statusBarColor = Color.Transparent,
-        navigationBarColor = Color.Transparent,
         darkIcons = !isDarkTheme
     )
 
     Scaffold(
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
@@ -246,8 +245,8 @@ fun PinEntryScreen(
 private fun PinKeyButton(
     onClick: () -> Unit,
     content: @Composable () -> Unit,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()

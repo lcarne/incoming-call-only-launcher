@@ -137,8 +137,6 @@ fun HomeScreen(
 
     // 6. System Bars Configuration
     SystemBarsColor(
-        statusBarColor = Color.Transparent,
-        navigationBarColor = Color.Transparent,
         darkIcons = false // Light icons on dark background
     )
 

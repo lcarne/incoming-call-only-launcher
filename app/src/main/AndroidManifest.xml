@@ -57,7 +57,7 @@
             android:exported="true"
 
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:supportsPictureInPicture="false"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:theme="@style/Theme.IncomingCallOnly">

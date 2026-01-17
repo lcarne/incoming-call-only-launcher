@@ -65,8 +65,6 @@ fun CallHistoryScreen(
     // System Bars Configuration - Transparent for edge-to-edge
     val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
     SystemBarsColor(
-        statusBarColor = Color.Transparent,
-        navigationBarColor = Color.Transparent,
         darkIcons = !isDarkTheme
     )
 

@@ -21,11 +21,11 @@ import androidx.compose.ui.window.DialogProperties
 fun AppDialog(
     onDismissRequest: () -> Unit,
     title: String,
+    buttons: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     message: String? = null,
     icon: ImageVector? = null,
-    buttons: @Composable () -> Unit,
-    content: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    content: @Composable (() -> Unit)? = null
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,

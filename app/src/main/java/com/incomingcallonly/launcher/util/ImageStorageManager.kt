@@ -2,6 +2,7 @@ package com.incomingcallonly.launcher.util
 
 import android.content.Context
 import android.net.Uri
+import kotlin.math.min
 import androidx.core.net.toUri
 import androidx.core.graphics.scale
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -32,7 +33,7 @@ class ImageStorageManager @Inject constructor(
                 
                 // Resize logic
                 val maxDimension = 512
-                val ratio = Math.min(
+                val ratio = min(
                     maxDimension.toFloat() / originalBitmap.width,
                     maxDimension.toFloat() / originalBitmap.height
                 )

@@ -21,8 +21,6 @@ import androidx.lifecycle.compose.LifecycleEventEffect
  */
 @Composable
 fun SystemBarsColor(
-    statusBarColor: Color? = null,
-    navigationBarColor: Color? = null,
     darkIcons: Boolean = false
 ) {
     val view = LocalView.current
@@ -31,9 +29,9 @@ fun SystemBarsColor(
     val applySystemBarsColors: () -> Unit = applyColors@ {
         val window = view.context.findActivity()?.window ?: return@applyColors
         @Suppress("DEPRECATION")
-        statusBarColor?.let { window.statusBarColor = it.toArgb() }
+        window.statusBarColor = Color.Transparent.toArgb()
         @Suppress("DEPRECATION")
-        navigationBarColor?.let { window.navigationBarColor = it.toArgb() }
+        window.navigationBarColor = Color.Transparent.toArgb()
         
         val windowInsetsController = WindowCompat.getInsetsController(window, view)
         windowInsetsController.isAppearanceLightStatusBars = darkIcons

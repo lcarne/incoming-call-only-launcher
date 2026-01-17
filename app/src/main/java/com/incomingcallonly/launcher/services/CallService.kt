@@ -42,7 +42,6 @@ class CallService : InCallService(), CallManager.AudioController {
 
         callManager.setCall(call)
 
-        // Wait for CallManager to approve the call before showing UI/Notification
         serviceScope.launch {
             callManager.isCallAllowed.collect { allowed ->
                 if (allowed) {

@@ -67,7 +67,6 @@
     <string name="accept_all_calls">Restreindre aux contacts uniquement</string>
     <string name="accept_all_calls_desc">Si désactivé, tous les appels sont autorisés</string>
     <string name="change_pin">Modifier le code PIN</string>
-    <string name="change_pin_desc">Modifier le code d\'accès administrateur</string>
     <string name="new_pin">Nouveau code PIN</string>
     <string name="previous_pin">Code PIN actuel</string>
     <string name="confirm_new_pin">Confirmer le nouveau code PIN</string>
@@ -107,7 +106,11 @@
     <string name="night_mode_active_ringer_off">Sonnerie désactivée\n(Mode Nuit de %1$s à %2$s)</string>
     <string name="night_start_label">Début de nuit</string>
     <string name="night_end_label">Fin de nuit</string>
-    <string name="night_mode_duration_desc">Durée : %1$d heures %2$s</string>
+    <plurals name="night_mode_duration_desc">
+        <item quantity="one">Durée : %1$d heure %2$s</item>
+        <item quantity="other">Durée : %1$d heures %2$s</item>
+        <item quantity="many">Durée : %1$d heures %2$s</item>
+    </plurals>
     <string name="next_day">(jusqu\'au lendemain)</string>
     <string name="select_hour">Choisir l\'heure</string>
 

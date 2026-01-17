@@ -92,7 +92,6 @@ class CallManager @Inject constructor(
         _incomingNumber.value = null
         _callState.value = CallState.Idle
 
-        // Register immediately to catch state changes during validation
         call.registerCallback(callCallback)
 
         val number = call.details.handle?.schemeSpecificPart
@@ -108,27 +107,24 @@ class CallManager @Inject constructor(
                 _isCallAllowed.value = true
                 updateState(call.state)
             } else {
-                // Silently reject if not a contact
                 call.reject(false, null)
                 // Log it as BLOCKED if screening didn't already
-                logCallInternal(number ?: context.getString(R.string.unknown_number), null, CallLogType.BLOCKED)
+                scope.launch {
+                    callLogRepository.insertCallLog(
+                        CallLog(
+                            number = number ?: context.getString(R.string.unknown_number),
+                            name = null,
+                            durationSeconds = 0, // Blocked calls resolve strictly to 0 duration here as per previous logic
+                            type = CallLogType.BLOCKED
+                        )
+                    )
+                }
                 currentCall = null
             }
         }
     }
 
-    private fun logCallInternal(number: String, contactName: String?, type: CallLogType) {
-        scope.launch {
-            callLogRepository.insertCallLog(
-                CallLog(
-                    number = number,
-                    name = contactName,
-                    durationSeconds = durationSeconds,
-                    type = type
-                )
-            )
-        }
-    }
+
 
     fun updateState(state: Int) {
         when (state) {
@@ -140,7 +136,6 @@ class CallManager @Inject constructor(
                 if (!wasAnswered) {
                     wasAnswered = true
                     answerTime = System.currentTimeMillis()
-                    // Set speaker based on preference
                     setSpeakerOn(settingsRepository.isDefaultSpeakerEnabled.value)
                 }
                 _callState.value = CallState.Active

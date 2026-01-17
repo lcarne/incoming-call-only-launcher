@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class ContactRepositoryImpl @Inject constructor(
     private val contactDao: ContactDao,
-    @param:ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context
 ) : ContactRepository {
     override fun getAllContacts(): Flow<List<Contact>> = contactDao.getAllContacts()
 
@@ -73,9 +73,10 @@ class ContactRepositoryImpl @Inject constructor(
             com.google.gson.Gson().fromJson(json, type)
 
         var count = 0
-        importList.forEach { dto ->
+        importList.filter { !it.phoneNumber.isNullOrBlank() }.forEach { dto ->
             // Check if contact already exists (simple check by number)
-            val existing = contactDao.getContactsList().find { it.phoneNumber == dto.phoneNumber }
+            val number = dto.phoneNumber!!
+            val existing = contactDao.getContactsList().find { it.phoneNumber == number }
             if (existing == null) {
                 var photoUri: String? = null
                 dto.photoBase64?.let { base64 ->
@@ -90,10 +91,15 @@ class ContactRepositoryImpl @Inject constructor(
                     }
                 }
 
-                val fullName = if (dto.lastName.isNotBlank()) "${dto.firstName} ${dto.lastName}" else dto.firstName
+                val first = dto.firstName ?: ""
+                val last = dto.lastName ?: ""
+                val fullName = if (last.isNotBlank()) "$first $last" else first
+                
+                val finalName = if (fullName.isBlank()) "Unknown" else fullName
+
                 val newContact = Contact(
-                    name = fullName,
-                    phoneNumber = dto.phoneNumber,
+                    name = finalName,
+                    phoneNumber = number,
                     photoUri = photoUri
                 )
                 contactDao.insertContact(newContact)

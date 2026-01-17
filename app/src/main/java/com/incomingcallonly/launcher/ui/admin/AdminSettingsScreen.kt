@@ -81,8 +81,6 @@ fun AdminSettingsScreen(
     // System Bars Configuration
     val isDarkTheme = isSystemInDarkTheme()
     SystemBarsColor(
-        statusBarColor = Color.Transparent,
-        navigationBarColor = Color.Transparent,
         darkIcons = !isDarkTheme
     )
 
@@ -235,7 +233,6 @@ fun AdminSettingsScreen(
                     leadingContent = {
                         AdminIcon(
                             painter = painterResource(id = R.drawable.ic_lock_open),
-                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
                             containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
                         )
@@ -257,8 +254,7 @@ fun AdminSettingsScreen(
                     },
                     leadingContent = {
                         AdminIcon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = null
+                            painter = painterResource(id = R.drawable.ic_arrow_back)
                         )
                     },
                     modifier = Modifier.clickable {
@@ -277,7 +273,6 @@ fun AdminSettingsScreen(
                 leadingIcon = {
                     AdminIcon(
                         painter = painterResource(id = R.drawable.ic_list),
-                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
@@ -301,7 +296,6 @@ fun AdminSettingsScreen(
                 leadingIcon = {
                     AdminIcon(
                         painter = painterResource(id = R.drawable.ic_call),
-                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
@@ -331,7 +325,6 @@ fun AdminSettingsScreen(
                     leadingContent = { 
                         AdminIcon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         ) 
                     },
@@ -346,7 +339,6 @@ fun AdminSettingsScreen(
                     leadingContent = { 
                         AdminIcon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         ) 
                     },
@@ -364,7 +356,6 @@ fun AdminSettingsScreen(
                     leadingContent = { 
                         AdminIcon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             containerColor = MaterialTheme.colorScheme.primaryContainer
                         ) 
@@ -386,7 +377,6 @@ fun AdminSettingsScreen(
                     leadingContent = { 
                         AdminIcon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
                             containerColor = MaterialTheme.colorScheme.errorContainer
                         ) 
@@ -405,7 +395,6 @@ fun AdminSettingsScreen(
                     leadingContent = { 
                         AdminIcon(
                             imageVector = Icons.Default.Favorite,
-                            contentDescription = null,
                             tint = Color(0xFFFFDD00), // Gold
                             containerColor = Color(0xFFFFDD00).copy(alpha = 0.1f)
                         ) 
