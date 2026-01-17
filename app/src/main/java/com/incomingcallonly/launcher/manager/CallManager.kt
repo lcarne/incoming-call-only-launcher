@@ -5,6 +5,7 @@ import android.telecom.Call
 import android.telecom.CallAudioState
 import android.telecom.VideoProfile
 import android.telephony.PhoneNumberUtils
+import android.os.Build
 import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.data.model.CallLog
 import com.incomingcallonly.launcher.data.model.CallLogType
@@ -32,6 +33,14 @@ class CallManager @Inject constructor(
     private companion object {
         const val MILLISECONDS_PER_SECOND = 1000L
     }
+
+    private val Call.compatState: Int
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            details.state
+        } else {
+            @Suppress("DEPRECATION")
+            state
+        }
 
     private var currentCall: Call? = null
     private var answerTime: Long = 0
@@ -105,7 +114,7 @@ class CallManager @Inject constructor(
             if (isContact || settingsRepository.allowAllCalls.value) {
                 _incomingNumber.value = number
                 _isCallAllowed.value = true
-                updateState(call.state)
+                updateState(call.compatState)
             } else {
                 call.reject(false, null)
                 // Log it as BLOCKED if screening didn't already
@@ -161,7 +170,7 @@ class CallManager @Inject constructor(
     }
 
     fun reject() {
-        if (currentCall?.state == Call.STATE_RINGING) {
+        if (currentCall?.compatState == Call.STATE_RINGING) {
             userRejected = true
             currentCall?.reject(false, null)
         } else {
