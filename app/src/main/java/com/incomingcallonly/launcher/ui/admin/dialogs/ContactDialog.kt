@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,7 +21,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,12 +53,8 @@ import com.incomingcallonly.launcher.R
 import com.incomingcallonly.launcher.data.model.Contact
 import com.incomingcallonly.launcher.ui.admin.components.AdminDialog
 import com.incomingcallonly.launcher.ui.theme.ConfirmGreen
-import com.incomingcallonly.launcher.ui.components.parseBoldString
 import com.incomingcallonly.launcher.ui.components.AppDialog
-import android.provider.Settings
-import android.content.Intent
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
