@@ -20,15 +20,15 @@ object LocaleHelper {
                 androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
             val sysLocale = android.content.res.Resources.getSystem().configuration.locales[0]
-            val defaultLang = if (sysLocale.language == "fr") "fr" else "en"
+            val defaultLang = if (sysLocale.language == "fr") "fr" else if (sysLocale.language == "es") "es" else "en"
             prefs.getString("language", defaultLang) ?: defaultLang
         } catch (e: Exception) {
             e.printStackTrace()
             val sysLocale = android.content.res.Resources.getSystem().configuration.locales[0]
-            if (sysLocale.language == "fr") "fr" else "en"
+            if (sysLocale.language == "fr") "fr" else if (sysLocale.language == "es") "es" else "en"
         }
 
-        val locale = if (lang == "en") Locale.ENGLISH else Locale("fr")
+        val locale = if (lang == "en") Locale.ENGLISH else if (lang == "fr") Locale("fr") else Locale("es")
 
         val config = Configuration(context.resources.configuration)
         Locale.setDefault(locale)

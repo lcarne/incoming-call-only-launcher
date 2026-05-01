@@ -137,6 +137,7 @@
     <string name="language">Langue</string>
     <string name="language_french">Français</string>
     <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
 
     <!-- ==================== ADMIN: CONTACTS ==================== -->
     <string name="manage_contacts">Gérer les contacts</string>
