@@ -19,7 +19,6 @@
     <string name="unpin">desfijar la app</string>
     <string name="change_default_phone_app">cambiar como telefono determinado</string>
     <string name="change_default_launcher">cambiar como launcher determinado</string>
-    <string name="allow_banking_apps">permitir apps de banca</string>
     <string name="allow_personal_apps">permitir apps personales</string>
     <string name="validate">Validate</string>
     <plurals name="press_again">
