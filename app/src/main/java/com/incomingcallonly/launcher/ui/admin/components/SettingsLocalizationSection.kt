@@ -47,7 +47,10 @@ fun SettingsLocalizationSection(viewModel: SettingsViewModel) {
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 headlineContent = { Text(stringResource(id = R.string.language)) },
                 supportingContent = {
-                    Text(if (lang == "fr") "Français" else "English")
+                    Text(
+                        if (lang == "fr") "Français" 
+                    else if (lang == "es") "Español" 
+                    else "English")
                 },
                 modifier = Modifier.clickable { showLangDialog = true }
             )
@@ -80,7 +83,8 @@ fun SettingsLocalizationSection(viewModel: SettingsViewModel) {
                 val languages = remember {
                     listOf(
                         Triple("fr", R.string.language_french, "🇫🇷"),
-                        Triple("en", R.string.language_english, "🇬🇧")
+                        Triple("en", R.string.language_english, "🇬🇧"),
+                        Triple("es", R.string.language_spanish, "🇪🇸")
                     )
                 }
 

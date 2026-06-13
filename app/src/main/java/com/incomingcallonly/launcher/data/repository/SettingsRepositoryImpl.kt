@@ -92,7 +92,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
 
     private val defaultLang =
-        if (android.content.res.Resources.getSystem().configuration.locales[0].language == "fr") "fr" else "en"
+        val systemLang = android.content.res.Resources.getSystem().configuration.locales[0].language
+        if (systemLang == "fr") "fr" else if (systemLang == "es") "es" else "en"
     private val _language =
         MutableStateFlow(prefs.getString(KEY_LANGUAGE, defaultLang) ?: defaultLang)
     override val language: StateFlow<String> = _language.asStateFlow()
