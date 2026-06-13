@@ -91,9 +91,13 @@ class SettingsRepositoryImpl @Inject constructor(
     override val preNightRingerEnabled: StateFlow<Boolean> = _preNightRingerEnabled.asStateFlow()
 
 
-    private val defaultLang =
-        val systemLang = android.content.res.Resources.getSystem().configuration.locales[0].language
-        if (systemLang == "fr") "fr" else if (systemLang == "es") "es" else "en"
+    private val defaultLang = android.content.res.Resources.getSystem().configuration.locales[0].language.let { lang ->
+        when (lang) {
+            "fr" -> "fr"
+            "es" -> "es"
+            else -> "en"
+        }
+    }
     private val _language =
         MutableStateFlow(prefs.getString(KEY_LANGUAGE, defaultLang) ?: defaultLang)
     override val language: StateFlow<String> = _language.asStateFlow()
