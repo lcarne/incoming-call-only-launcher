@@ -19,7 +19,6 @@
     <string name="unpin">Unpin the app</string>
     <string name="change_default_phone_app">Change default phone app</string>
     <string name="change_default_launcher">Change default home app</string>
-    <string name="allow_banking_apps">Allow banking apps</string>
     <string name="validate">Validate</string>
     <plurals name="press_again">
         <item quantity="one">%1$d more tap</item>
